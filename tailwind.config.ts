@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#2D2C54",
+        navlabel: "#7B7BBC",
       },
     },
   },
