@@ -2,22 +2,13 @@ import React from "react";
 import SongCard from "./SongCard";
 
 const SongCardSection = () => {
+  const amount = 10;
   return (
     <div>
-      <div className="bg-[#1E1E3F] rounded-[12px] flex overflow-auto max-w-[calc(100vw-336px)] ">
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
-        <SongCard />
+      <div className="rounded-[12px] flex overflow-auto ">
+        {[...Array(amount)].map((_, index) => (
+          <SongCard key={index} />
+        ))}
       </div>
     </div>
   );

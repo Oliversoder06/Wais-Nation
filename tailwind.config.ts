@@ -9,8 +9,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#2D2C54",
-        navlabel: "#7B7BBC",
+        background: "#0D0D0D",
+        nit: "#ABAAB8", // NOT IMPORTANT TEXT
       },
     },
   },
