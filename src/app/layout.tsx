@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-background flex">
         <Sidebar />
-        <main className="ml-[144px] w-[calc(100%-508px)]">
+        <main className="ml-[144px] w-[calc(100%-508px)] pb-[120px]">
           <nav className="py-[20px]">
             <DesktopSearchbar />
           </nav>
