@@ -7,7 +7,7 @@ const Liked = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="h-[calc(30vh)] bg-gradient-to-t from-[#005E38] to-[#0E0E0E] flex justify-center gap-[64px] mt-[40px]">
+      <div className="h-[calc(30vh)] min-h-[300px] bg-gradient-to-t from-[#005E38] to-[#0E0E0E] flex justify-center items-center gap-[64px] mt-[40px]">
         <div className="size-[248px] bg-gradient-to-br from-[#00FF99] to-[#026F69] rounded-[24px] flex items-center justify-center">
           <Image src="/icons/heart.svg" alt="heart" width={84} height={84} />
         </div>
