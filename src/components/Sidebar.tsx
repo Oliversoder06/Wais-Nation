@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import NavigationItem from "./NavigationItem";
-import Image from "next/image";
+import AuthButtons from "./AuthButtons";
+import { UserButton, UserProfile } from "@clerk/nextjs";
 
 const Sidebar = () => {
   return (
@@ -21,7 +22,11 @@ const Sidebar = () => {
             anchor="/collections/playlists"
           />
         </div>
-        <Image src="/icons/Profile.svg" alt="Profile" width={40} height={40} />
+
+        <AuthButtons />
+
+        {/* <Image src="/icons/Profile.svg" alt="Profile" width={40} height={40} /> */}
+        <UserButton />
       </div>
     </div>
   );

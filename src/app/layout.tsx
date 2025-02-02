@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import Sideplayer from "@/components/Sideplayer";
 import DesktopSearchbar from "@/components/DesktopSearchbar";
 import MusicPlayer from "@/components/MusicPlayer";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,18 +17,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-background flex">
-        <Sidebar />
-        <main className="ml-[144px] w-[calc(100%-508px)] pb-[120px]">
-          <nav className="py-[20px]">
-            <DesktopSearchbar />
-          </nav>
-          {children}
-        </main>
-        <Sideplayer />
-        <MusicPlayer />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className="bg-background flex">
+          <Sidebar />
+          <main className="ml-[144px] w-[calc(100%-508px)] pb-[120px]">
+            <nav className="py-[20px]">
+              <DesktopSearchbar />
+            </nav>
+            {children}
+          </main>
+          <Sideplayer />
+          <MusicPlayer />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -1,33 +1,53 @@
 "use client";
+
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 
-const LongPlaylistCard = () => {
+// Define props for LongPlaylistCard
+interface LongPlaylistCardProps {
+  name: string;
+  description?: string;
+  owner: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}
+
+const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
+  name,
+  description,
+  owner,
+  onEdit,
+  onDelete,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="bg-[#151418] w-full h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative">
       <div className="flex gap-4 items-center">
-        <div className="size-[104px] bg-[#00FF99]" />
+        {/* Playlist Image Placeholder */}
+        <div className="size-[104px] bg-[#00FF99] rounded-[8px]" />
+
+        {/* Playlist Info */}
         <div className="flex flex-col leading-[24px]">
-          <span className="text-white text-[20px] font-semibold">
-            My Cool Playlist
+          <span className="text-white text-[20px] font-semibold">{name}</span>
+          <span className="text-[#ABAAB8] text-[16px]">{owner}</span>
+          <span className="text-[#6E6D78] text-[14px]">
+            {description || "No description available"}
           </span>
-          <span className="text-[#ABAAB8] text-[16px]">Oliver Söderlund</span>
         </div>
       </div>
 
-      {/* Clickable Div Instead of Button to Fix HTML Issue */}
+      {/* Clickable Dots Menu */}
       <div
         ref={menuRef}
         role="button"
         tabIndex={0}
         onClick={() => setIsOpen(!isOpen)}
-        onBlur={() => setTimeout(() => setIsOpen(false), 100)}
+        onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         className="relative flex items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-[#2A2932] transition cursor-pointer"
       >
-        {/* Animated 3-Dots (Morphs into menu) */}
+        {/* Animated 3-Dots (Morphs into Menu) */}
         <motion.div
           initial={false}
           animate={isOpen ? "open" : "closed"}
@@ -59,7 +79,7 @@ const LongPlaylistCard = () => {
           />
         </motion.div>
 
-        {/* Expanding Menu (Replaces Dots) */}
+        {/* Expanding Menu */}
         {isOpen && (
           <motion.div
             variants={{
@@ -70,13 +90,19 @@ const LongPlaylistCard = () => {
             className="absolute right-0 mt-4 w-36 bg-[#1D1C24] rounded-[8px] shadow-lg flex flex-col overflow-hidden"
           >
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                onEdit?.();
+              }}
               className="text-white text-sm px-4 py-2 hover:bg-[#2A2932] transition"
             >
               Edit
             </button>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                onDelete?.();
+              }}
               className="text-red-400 text-sm px-4 py-2 hover:bg-[#2A2932] transition"
             >
               Delete
