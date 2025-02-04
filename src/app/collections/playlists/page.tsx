@@ -83,7 +83,8 @@ const Playlists: React.FC = () => {
         <div className="flex flex-col justify-center gap-[8px]">
           <h1 className="text-white font-black text-[64px]">Your Playlists</h1>
           <h1 className="text-[#ABAABB] text-[20px] font-medium">
-            {playlists.length} playlists
+            {playlists.filter((playlist) => playlist.user_id === userId).length}{" "}
+            playlists
           </h1>
         </div>
       </div>
