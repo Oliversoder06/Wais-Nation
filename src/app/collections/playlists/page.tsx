@@ -4,7 +4,7 @@ import LongPlaylistCard from "@/components/LongPlaylistCard";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@clerk/nextjs";
+import { SignInButton, useAuth } from "@clerk/nextjs";
 
 // Define the Playlist type
 interface Playlist {
@@ -26,7 +26,10 @@ const Playlists: React.FC = () => {
   useEffect(() => {
     const fetchPlaylists = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from("playlists").select("*");
+      const { data, error } = await supabase
+        .from("playlists")
+        .select("id, name, description, user_id"); // ✅ Ensure `id` (UUID) is fetched
+
       if (error) {
         console.error("Error fetching playlists:", error.message);
       } else {
@@ -34,6 +37,7 @@ const Playlists: React.FC = () => {
       }
       setLoading(false);
     };
+
     fetchPlaylists();
   }, []);
 
@@ -96,42 +100,80 @@ const Playlists: React.FC = () => {
             onClick={() => setShowModal(true)}
           />
         ) : (
-          <span className="text-[#ABAABB]">Sign in to create playlists</span>
+          <p className="text-[#ABAABB]">
+            <SignInButton>
+              <span className="cursor-pointer hover:underline text-blue-500">
+                Sign in
+              </span>
+            </SignInButton>{" "}
+            to create playlists
+          </p>
         )}
       </div>
 
       {/* Modal for Creating Playlist */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-[#0E0E0E] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
-            <h2 className="text-white text-2xl font-bold">
-              Create New Playlist
-            </h2>
-            <input
-              type="text"
-              placeholder="Playlist Name"
-              value={playlistName}
-              onChange={(e) => setPlaylistName(e.target.value)}
-              className="p-2 rounded-md bg-gray-800 text-white border border-gray-600"
-            />
-            <textarea
-              placeholder="Playlist Description"
-              value={playlistDescription}
-              onChange={(e) => setPlaylistDescription(e.target.value)}
-              className="p-2 rounded-md bg-gray-800 text-white border border-gray-600"
-            ></textarea>
-            <div className="flex justify-end gap-4">
-              <button
-                className="px-4 py-2 bg-gray-700 text-white rounded-md"
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+            <div className="flex justify-between">
+              <h2 className="text-white text-2xl font-bold">
+                Create New Playlist
+              </h2>
+              <Image
+                src="/icons/cross.svg"
+                alt="cross icon"
+                width={28}
+                height={28}
+                className="cursor-pointer self-end"
                 onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
+              />
+            </div>
+            <div className="flex flex-col">
+              <input
+                type="text"
+                placeholder="Playlist Name"
+                value={playlistName}
+                maxLength={50}
+                onChange={(e) => setPlaylistName(e.target.value)}
+                className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141]"
+              />
+              {playlistName.length > 0 &&
+                (playlistName.length < 50 ? (
+                  <span className="text-[#ABAABB] text-sm text-right">
+                    {playlistName.length}/50
+                  </span>
+                ) : (
+                  <span className="text-[#ff1616] text-sm text-right">
+                    {playlistName.length}/50
+                  </span>
+                ))}
+            </div>
+            <div className="flex flex-col">
+              <textarea
+                placeholder="Playlist Description"
+                value={playlistDescription}
+                onChange={(e) => setPlaylistDescription(e.target.value)}
+                maxLength={100}
+                className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141] resize-none"
+              ></textarea>
+              {/* Character Counter */}
+              {playlistDescription.length > 0 &&
+                (playlistDescription.length < 100 ? (
+                  <span className="text-[#ABAABB] text-sm text-right">
+                    {playlistDescription.length}/100
+                  </span>
+                ) : (
+                  <span className="text-[#ff1616] text-sm text-right">
+                    {playlistDescription.length}/100
+                  </span>
+                ))}
+            </div>
+            <div className="flex justify-center gap-4">
               <button
-                className="px-4 py-2 bg-green-600 text-white rounded-md"
+                className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
                 onClick={createPlaylist}
               >
-                Create
+                Save
               </button>
             </div>
           </div>
@@ -143,26 +185,30 @@ const Playlists: React.FC = () => {
         <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
           Loading playlists...
         </span>
-      ) : playlists.length < 1 ? (
+      ) : playlists.filter((playlist) => playlist.user_id === userId).length <
+        1 ? (
         <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
           Looks pretty empty.
         </span>
       ) : (
         <div className="flex flex-col gap-4 mx-[40px]">
-          {playlists.map((playlist, index) => (
-            <div key={playlist.id} className="flex items-center gap-4">
-              <span className="text-white text-lg font-semibold w-[24px] text-right">
-                {index + 1}
-              </span>
-              <LongPlaylistCard
-                name={playlist.name}
-                description={playlist.description}
-                owner={playlist.user_id === userId ? "You" : "Other User"}
-                onEdit={() => console.log("Edit Playlist:", playlist.name)}
-                onDelete={() => console.log("Delete Playlist:", playlist.id)}
-              />
-            </div>
-          ))}
+          {playlists
+            .filter((playlist) => playlist.user_id === userId) // Filter playlists by userId
+            .map((playlist, index) => (
+              <div key={playlist.id} className="flex items-center gap-4">
+                <span className="text-white text-lg font-semibold w-[24px] text-right">
+                  {index + 1}
+                </span>
+                <LongPlaylistCard
+                  name={playlist.name}
+                  description={playlist.description}
+                  owner="You"
+                  onEdit={() => console.log("Edit Playlist:", playlist.name)}
+                  onDelete={() => console.log("Delete Playlist:", playlist.id)}
+                  uuid={playlist.id} // ✅ Pass the `id` (UUID) to the `uuid` prop
+                />
+              </div>
+            ))}
         </div>
       )}
     </div>

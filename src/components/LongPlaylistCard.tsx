@@ -2,9 +2,11 @@
 
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
-// Define props for LongPlaylistCard
 interface LongPlaylistCardProps {
+  uuid?: string;
   name: string;
   description?: string;
   owner: string;
@@ -13,6 +15,7 @@ interface LongPlaylistCardProps {
 }
 
 const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
+  uuid,
   name,
   description,
   owner,
@@ -23,15 +26,28 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="bg-[#151418] w-full h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative">
+    <Link
+      href={uuid ? `/collections/playlists/${uuid}` : "#"}
+      className="bg-[#151418] hover:bg-[#25242b] cursor-pointer w-full h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative"
+    >
       <div className="flex gap-4 items-center">
         {/* Playlist Image Placeholder */}
-        <div className="size-[104px] bg-[#00FF99] rounded-[8px]" />
+        <Image
+          src="/images/playlist.svg"
+          alt="Playlist Image"
+          width={104}
+          height={104}
+          unoptimized={true}
+        />
 
         {/* Playlist Info */}
         <div className="flex flex-col leading-[24px]">
           <span className="text-white text-[20px] font-semibold">{name}</span>
-          <span className="text-[#ABAAB8] text-[16px]">{owner}</span>
+          <div>
+            <span className="text-[#ABAAB8] text-[16px] hover:underline">
+              {owner}
+            </span>
+          </div>
           <span className="text-[#6E6D78] text-[14px]">
             {description || "No description available"}
           </span>
@@ -110,7 +126,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
           </motion.div>
         )}
       </div>
-    </div>
+    </Link>
   );
 };
 
