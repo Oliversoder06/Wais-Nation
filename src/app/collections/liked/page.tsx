@@ -25,7 +25,12 @@ const Liked = () => {
             <span className="text-white text-lg font-semibold w-[24px] text-right">
               {index + 1}
             </span>
-            <LongSongCard />
+            <LongSongCard
+              title="sEXY"
+              artist="Wais Music"
+              album="sEXY"
+              date="2021-09-17"
+            />
           </div>
         ))}
       </div>

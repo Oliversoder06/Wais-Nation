@@ -6,7 +6,6 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { SignInButton, useAuth } from "@clerk/nextjs";
 
-// Define the Playlist type
 interface Playlist {
   id: string;
   name: string;
@@ -28,7 +27,7 @@ const Playlists: React.FC = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("playlists")
-        .select("id, name, description, user_id"); // ✅ Ensure `id` (UUID) is fetched
+        .select("id, name, description, user_id");
 
       if (error) {
         console.error("Error fetching playlists:", error.message);
@@ -37,7 +36,6 @@ const Playlists: React.FC = () => {
       }
       setLoading(false);
     };
-
     fetchPlaylists();
   }, []);
 
@@ -200,14 +198,7 @@ const Playlists: React.FC = () => {
                 <span className="text-white text-lg font-semibold w-[24px] text-right">
                   {index + 1}
                 </span>
-                <LongPlaylistCard
-                  name={playlist.name}
-                  description={playlist.description}
-                  owner="You"
-                  onEdit={() => console.log("Edit Playlist:", playlist.name)}
-                  onDelete={() => console.log("Delete Playlist:", playlist.id)}
-                  uuid={playlist.id} // ✅ Pass the `id` (UUID) to the `uuid` prop
-                />
+                <LongPlaylistCard playlistId="3cEYpjA9oz9GiPac4AsH4n?locale=en-US%2Cen%3Bq%3D0.9%2Csv%3Bq%3D0.8%2Cen-GB%3Bq%3D0.7" />
               </div>
             ))}
         </div>
