@@ -14,7 +14,7 @@ export default function LongSongCard({
   date,
 }: LongSongCardProps) {
   return (
-    <div className="bg-[#151418] w-full h-[92px] rounded-[8px] flex items-center justify-between px-[16px]">
+    <div className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center justify-between px-[16px]">
       <div className="flex gap-4 items-center">
         <Image
           src={"/images/playlist.svg"}

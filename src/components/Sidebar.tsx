@@ -25,7 +25,6 @@ const Sidebar = () => {
 
         <AuthButtons />
 
-        {/* <Image src="/icons/Profile.svg" alt="Profile" width={40} height={40} /> */}
         <UserButton />
       </div>
     </div>

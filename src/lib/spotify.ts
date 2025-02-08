@@ -1,8 +1,7 @@
+const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
+const clientSecret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET!;
 export async function getSpotifyToken(): Promise<string> {
   try {
-    const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
-    const clientSecret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET!;
-
     if (!clientId || !clientSecret) {
       throw new Error("Missing Spotify API credentials");
     }
@@ -34,13 +33,14 @@ export async function getSpotifyToken(): Promise<string> {
   }
 }
 
-export async function getPlaylist(playlistId: string) {
+export async function searchSpotify(query: string): Promise<any> {
   try {
     const token = await getSpotifyToken();
-    console.log("Fetching playlist with ID:", playlistId);
-
+    console.log("Searching Spotify for:", query);
     const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${playlistId}`,
+      `https://api.spotify.com/v1/search?offset=0&limit=10&q=${encodeURIComponent(
+        query
+      )}&type=track`,
       {
         method: "GET",
         headers: {
@@ -48,43 +48,17 @@ export async function getPlaylist(playlistId: string) {
         },
       }
     );
-    // console.log("token:", token);
 
     console.log("Response status:", response.status);
     if (!response.ok) {
-      throw new Error(`Failed to fetch playlist: ${response.statusText}`);
+      throw new Error(`Failed to search Spotify: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log("Search results:", data);
+    return data;
   } catch (error) {
-    console.error("Error fetching playlist:", error);
-  }
-}
-
-export async function getPlaylistTracks(playlistId: string) {
-  try {
-    const token = await getSpotifyToken();
-    console.log("Fetching playlist tracks with ID:", playlistId);
-
-    const limit = 3;
-    const offset = 0;
-
-    const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("Response status:", response.status);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch playlist: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Error fetching playlist tracks:", error);
+    console.error("Error searching Spotify:", error);
+    return null;
   }
 }

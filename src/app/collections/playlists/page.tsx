@@ -198,7 +198,13 @@ const Playlists: React.FC = () => {
                 <span className="text-white text-lg font-semibold w-[24px] text-right">
                   {index + 1}
                 </span>
-                <LongPlaylistCard playlistId="3cEYpjA9oz9GiPac4AsH4n?locale=en-US%2Cen%3Bq%3D0.9%2Csv%3Bq%3D0.8%2Cen-GB%3Bq%3D0.7" />
+                {/* <LongPlaylistCard playlistId="3cEYpjA9oz9GiPac4AsH4n?locale=en-US%2Cen%3Bq%3D0.9%2Csv%3Bq%3D0.8%2Cen-GB%3Bq%3D0.7" /> */}
+                <LongPlaylistCard
+                  owner="Wais Music"
+                  name={playlist.name}
+                  description={playlist.description}
+                  id={playlist.id}
+                />
               </div>
             ))}
         </div>
