@@ -64,7 +64,6 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
         onClick={(e) => {
           setIsOpen(!isOpen);
         }}
-        onBlur={() => setTimeout(() => setIsOpen(false), 150)}
         className="absolute top-1/2 right-6 transform -translate-y-1/2 flex items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
       >
         {/* Animated 3-Dots (Morphs into Menu) */}

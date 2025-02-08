@@ -12,7 +12,9 @@ export const fetchYouTubeVideos = async (songs: any[]) => {
           query
         )}&maxResults=1&type=video&key=${YOUTUBE_API_KEY}`
       );
-      const data = await response.json();
+      const data = (await response.json()) as {
+        items: { id: { videoId: string } }[];
+      };
       return { ...song, youtubeId: data.items[0]?.id?.videoId };
     })
   );

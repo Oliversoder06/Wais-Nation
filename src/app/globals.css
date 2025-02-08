@@ -16,3 +16,13 @@
     transform: rotate(360deg);
   }
 }
+
+.track-bg {
+  mask-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 25%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0.3;
+  filter: blur(5px);
+}

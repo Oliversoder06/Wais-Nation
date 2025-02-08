@@ -62,3 +62,28 @@ export async function searchSpotify(query: string): Promise<any> {
     return null;
   }
 }
+
+export async function getTrackDetails(trackId: string): Promise<any> {
+  try {
+    const token = await getSpotifyToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/tracks/${trackId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get track details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching track details:", error);
+    return null;
+  }
+}
