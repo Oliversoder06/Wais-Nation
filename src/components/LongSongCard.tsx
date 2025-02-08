@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 interface LongSongCardProps {
   title: string;
@@ -20,7 +20,6 @@ export default function LongSongCard({
   cover,
 }: LongSongCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
