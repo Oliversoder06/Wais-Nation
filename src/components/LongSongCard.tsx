@@ -57,58 +57,60 @@ export default function LongSongCard({
   };
 
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center justify-between px-[16px]"
-    >
-      <div className="flex gap-4 items-center">
-        {cover ? (
-          <img
-            src={cover}
-            alt={title}
-            width={56}
-            height={56}
-            className="rounded-[8px]"
-          />
-        ) : (
-          <img
-            src="/images/playlist.svg"
-            alt="Song Cover"
-            width={48}
-            height={48}
-            className="rounded-md"
-          />
-        )}
-        <div className="flex flex-col leading-[24px]">
-          <span className="text-white text-[20px] font-semibold max-w-[400px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
-            {title}
+    <div className="w-full">
+      <div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center justify-between px-[16px]"
+      >
+        <div className="flex gap-4 items-center">
+          {cover ? (
+            <img
+              src={cover}
+              alt={title}
+              width={56}
+              height={56}
+              className="rounded-[8px]"
+            />
+          ) : (
+            <img
+              src="/images/playlist.svg"
+              alt="Song Cover"
+              width={48}
+              height={48}
+              className="rounded-md"
+            />
+          )}
+          <div className="flex flex-col leading-[24px]">
+            <span className="text-white text-[20px] font-semibold max-w-[400px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+              {title}
+            </span>
+            <span className="text-[#ABAAB8] text-[16px]">{artist}</span>
+          </div>
+        </div>
+        <span className="text-[#ABAABB]">{album}</span>
+        <span className="text-[#ABAABB]">{date}</span>
+        <div className="flex items-center gap-4 relative">
+          <span
+            className={`text-[#ABAABB] pr-[16px] ${isHovered && "opacity-0"}`}
+          >
+            {duration}
           </span>
-          <span className="text-[#ABAAB8] text-[16px]">{artist}</span>
+          {isHovered && (
+            <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
+              <Image
+                src="/icons/create-plus.svg"
+                alt="Menu"
+                width={36}
+                height={36}
+                onClick={handleAddToPlaylist}
+              />
+            </div>
+          )}
         </div>
       </div>
-      <span className="text-[#ABAABB]">{album}</span>
-      <span className="text-[#ABAABB]">{date}</span>
-      <div className="flex items-center gap-4 relative">
-        <span
-          className={`text-[#ABAABB] pr-[16px] ${isHovered && "opacity-0"}`}
-        >
-          {duration}
-        </span>
-        {isHovered && (
-          <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
-            <Image
-              src="/icons/create-plus.svg"
-              alt="Menu"
-              width={36}
-              height={36}
-              onClick={handleAddToPlaylist}
-            />
-          </div>
-        )}
-      </div>
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]">
           <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
             <div className="flex justify-between">
               <h2 className="text-white text-2xl font-bold">Add to Playlist</h2>
@@ -121,12 +123,15 @@ export default function LongSongCard({
                 onClick={() => setShowModal(false)}
               />
             </div>
+
             <div className="flex flex-col">
               {loading ? (
                 <div className="loader flex justify-self-center" />
+              ) : playlists.length === 0 ? (
+                <p className="text-nit text-center">Looks pretty empty.</p>
               ) : (
                 playlists.map((playlist) => (
-                  <div key={playlist.id} className="">
+                  <div key={playlist.id} className="flex flex-col gap-4">
                     <label
                       htmlFor={playlist.id}
                       className="text-white cursor-pointer w-full p-5 flex items-center justify-between bg-[#2b2b2b] rounded-md transition hover:bg-[#3a3a3a]"
@@ -158,6 +163,9 @@ export default function LongSongCard({
                         </svg>
                       </label>
                     </label>
+                    <button className="bg-[#00FF99] text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]">
+                      Add to Playlist
+                    </button>
                   </div>
                 ))
               )}
