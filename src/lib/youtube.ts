@@ -2,7 +2,6 @@ import fetch from "node-fetch";
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY!;
 
-/** Search YouTube for the song */
 export const fetchYouTubeVideos = async (songs: any[]) => {
   const results = await Promise.all(
     songs.map(async (song) => {

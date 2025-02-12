@@ -5,19 +5,32 @@ import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
 import toast from "react-hot-toast";
+import { getTrackDetails } from "@/lib/spotify";
+
 interface Playlist {
   id: string;
   name: string;
   description?: string;
   user_id: string;
 }
+
+interface Track {
+  id: string;
+  playlist_id: string;
+  added_at: string;
+  title: string;
+  artist: string;
+  album: string;
+  duration: string;
+  cover: string;
+}
+
 export default function PlaylistPage() {
   const params = useParams();
   const uuid = params?.uuid as string;
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [track, setTrack] = useState<Track[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const amount = 7;
 
   useEffect(() => {
     if (!uuid) {
@@ -25,27 +38,62 @@ export default function PlaylistPage() {
       setLoading(false);
       return;
     }
-    const fetchPlaylist = async () => {
-      const { data, error } = await supabase
+
+    const fetchData = async () => {
+      setLoading(true);
+
+      // Fetch playlist details
+      const { data: playlistData, error: playlistError } = await supabase
         .from("playlists")
         .select("*")
         .eq("id", uuid)
         .single();
-      if (error) {
-        toast.error("Error fetching playlist:");
-        console.log("Error fetching playlist: ", error.message);
-      } else {
-        setPlaylist(data);
+
+      if (playlistError) {
+        toast.error("Error fetching playlist.");
+        console.error("Error fetching playlist:", playlistError.message);
+        setLoading(false);
+        return;
       }
+
+      setPlaylist(playlistData);
+
+      // Fetch tracks inside this playlist
+      const { data: trackData, error: trackError } = await supabase
+        .from("playlist_tracks")
+        .select("*")
+        .eq("playlist_id", uuid);
+
+      if (trackError) {
+        toast.error("Error fetching tracks.");
+        console.error("Error fetching tracks:", trackError.message);
+      } else {
+        setTrack(trackData || []);
+      }
+
       setLoading(false);
     };
-    fetchPlaylist();
+
+    fetchData();
   }, [uuid]);
+
   if (loading) {
-    return <div className="text-white text-center">Loading...</div>;
+    return <div className="text-white text-center mt-10">Loading...</div>;
   }
+
   if (!playlist) {
-    return <div className="text-white text-center">Playlist not found</div>;
+    return (
+      <div className="text-white text-center mt-10">Playlist not found</div>
+    );
+  }
+
+  function formatDate(isoString: string): string {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   }
 
   return (
@@ -62,20 +110,25 @@ export default function PlaylistPage() {
           {playlist.description || "No description available"}
         </p>
       </div>
+
       <div className="flex flex-col gap-4 mx-[40px]">
-        {[...Array(amount)].map((_, index) => (
-          <div key={index} className="flex items-center gap-4">
-            <span className="text-white text-lg font-semibold w-[24px] text-right">
-              {index + 1}
-            </span>
+        {track.length === 0 ? (
+          <p className="text-gray-400 text-center">
+            No tracks added to this playlist yet.
+          </p>
+        ) : (
+          track.map((track) => (
             <LongSongCard
-              title="sEXY"
-              artist="Wais Music"
-              album="sEXY"
-              date="2021-09-17"
+              key={track.id}
+              title={track.title || "Unknown Title"}
+              artist={track.artist || "Unknown Title"}
+              album={track.album || "Unknown Album"}
+              date={formatDate(track.added_at)}
+              duration={track.duration || "-:--"}
+              cover={track.cover}
             />
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

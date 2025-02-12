@@ -33,6 +33,7 @@ export default function LongSongCard({
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -56,12 +57,47 @@ export default function LongSongCard({
     setShowModal(true);
   };
 
+  const handleCheckboxChange = (playlistId: string) => {
+    setSelectedPlaylists((prev) =>
+      prev.includes(playlistId)
+        ? prev.filter((id) => id !== playlistId)
+        : [...prev, playlistId]
+    );
+  };
+
+  const handleAddTracksToPlaylists = async () => {
+    if (selectedPlaylists.length === 0) {
+      toast.error("Select at least one playlist.");
+      return;
+    }
+
+    const { error } = await supabase.from("playlist_tracks").insert(
+      selectedPlaylists.map((playlistId) => ({
+        playlist_id: playlistId,
+        title: title,
+        artist: artist,
+        album: album,
+        duration: duration,
+        cover: cover,
+      }))
+    );
+
+    if (error) {
+      console.error("Error adding track to playlists:", error);
+      toast.error("Failed to add track.");
+    } else {
+      toast.success("Track added successfully!");
+      setShowModal(false);
+      setSelectedPlaylists([]);
+    }
+  };
+
   return (
     <div className="w-full">
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center justify-between px-[16px]"
+        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center gap-[140px] px-[16px]"
       >
         <div className="flex gap-4 items-center">
           {cover ? (
@@ -82,31 +118,35 @@ export default function LongSongCard({
             />
           )}
           <div className="flex flex-col leading-[24px]">
-            <span className="text-white text-[20px] font-semibold max-w-[400px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+            <span className="text-white text-[20px] font-semibold w-[350px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
               {title}
             </span>
             <span className="text-[#ABAAB8] text-[16px]">{artist}</span>
           </div>
         </div>
-        <span className="text-[#ABAABB]">{album}</span>
-        <span className="text-[#ABAABB]">{date}</span>
-        <div className="flex items-center gap-4 relative">
-          <span
-            className={`text-[#ABAABB] pr-[16px] ${isHovered && "opacity-0"}`}
-          >
-            {duration}
-          </span>
-          {isHovered && (
-            <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
-              <Image
-                src="/icons/create-plus.svg"
-                alt="Menu"
-                width={36}
-                height={36}
-                onClick={handleAddToPlaylist}
-              />
-            </div>
-          )}
+        <span className="text-[#ABAABB] w-[350px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+          {album}
+        </span>
+        <div className="flex gap-4 items-center justify-between w-full">
+          <span className="text-[#ABAABB]">{date}</span>
+          <div className="flex items-center gap-4 relative">
+            <span
+              className={`text-[#ABAABB] pr-[16px] ${isHovered && "opacity-0"}`}
+            >
+              {duration}
+            </span>
+            {isHovered && (
+              <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
+                <Image
+                  src="/icons/create-plus.svg"
+                  alt="Menu"
+                  width={36}
+                  height={36}
+                  onClick={handleAddToPlaylist}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {showModal && (
@@ -142,7 +182,10 @@ export default function LongSongCard({
                         type="checkbox"
                         id={playlist.id}
                         className="hidden peer"
+                        checked={selectedPlaylists.includes(playlist.id)}
+                        onChange={() => handleCheckboxChange(playlist.id)}
                       />
+
                       <label
                         htmlFor={playlist.id}
                         className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
@@ -163,13 +206,16 @@ export default function LongSongCard({
                         </svg>
                       </label>
                     </label>
-                    <button className="bg-[#00FF99] text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]">
-                      Add to Playlist
-                    </button>
                   </div>
                 ))
               )}
             </div>
+            <button
+              onClick={handleAddTracksToPlaylists}
+              className="bg-[#00FF99] text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]"
+            >
+              Add to Playlist
+            </button>
           </div>
         </div>
       )}
