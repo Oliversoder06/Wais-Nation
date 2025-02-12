@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
+import toast from "react-hot-toast";
 interface Playlist {
   id: string;
   name: string;
@@ -20,7 +21,7 @@ export default function PlaylistPage() {
 
   useEffect(() => {
     if (!uuid) {
-      console.error("UUID is missing from the URL");
+      toast.error("UUID is missing from the URL");
       setLoading(false);
       return;
     }
@@ -31,7 +32,8 @@ export default function PlaylistPage() {
         .eq("id", uuid)
         .single();
       if (error) {
-        console.error("Error fetching playlist:", error.message);
+        toast.error("Error fetching playlist:");
+        console.log("Error fetching playlist: ", error.message);
       } else {
         setPlaylist(data);
       }

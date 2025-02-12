@@ -4,13 +4,14 @@ import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { deletePlaylist } from "@/lib/playlists";
+import toast from "react-hot-toast";
 
 interface LongPlaylistCardProps {
   id?: string;
   name: string;
   description?: string;
   owner: string;
-  onEdit?: () => void;
   onDelete?: () => void;
 }
 
@@ -19,11 +20,21 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
   name,
   description,
   owner,
-  onEdit,
   onDelete,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!id) {
+      toast.error("Playlist ID is missing, try refreshing the page");
+      console.log("Playlist ID is missing");
+      return;
+    }
+
+    setIsDeleting(true);
+  };
 
   return (
     <div className="relative w-full">
@@ -109,21 +120,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
             className="absolute left-50 top-[50%] mt-4 w-36 bg-[#1D1C24] rounded-[8px] shadow-lg flex flex-col overflow-hidden select-none"
           >
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-                onEdit?.();
-              }}
-              className="text-white text-sm px-4 py-2 hover:bg-[#2A2932] transition"
-            >
-              Edit
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen(false);
-                onDelete?.();
-              }}
+              onClick={handleDelete}
               className="text-red-400 text-sm px-4 py-2 hover:bg-[#2A2932] transition"
             >
               Delete
@@ -131,6 +128,48 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
           </motion.div>
         )}
       </div>
+      {isDeleting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-white text-[24px]">
+                Are you sure you want to delete this playlist?{" "}
+                <span className="font-bold text-white">({name})</span>
+              </h2>
+              <p className="text-[#ABAAB8] text-sm">
+                This action cannot be undone. This will permanently delete the
+                playlist.
+              </p>
+            </div>
+            <div className="flex justify-center gap-4">
+              <button
+                className="px-8 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700"
+                onClick={() => {
+                  setIsDeleting(false);
+                  onDelete?.();
+                  toast.success("Playlist deleted successfully");
+
+                  if (id) {
+                    deletePlaylist(id);
+                  } else {
+                    toast.error(
+                      "Playlist ID is missing, try refreshing the page"
+                    );
+                  }
+                }}
+              >
+                Yes
+              </button>
+              <button
+                className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
+                onClick={() => setIsDeleting(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

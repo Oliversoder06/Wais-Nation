@@ -5,6 +5,7 @@ import Sideplayer from "@/components/Sideplayer";
 import DesktopSearchbar from "@/components/DesktopSearchbar";
 import MusicPlayer from "@/components/MusicPlayer";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,6 +30,7 @@ export default function RootLayout({
           </main>
           <Sideplayer />
           <MusicPlayer />
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

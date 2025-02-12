@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { supabase } from "./supabase"; // ✅ Import the Supabase client
 
 // Sign in with Google
@@ -7,7 +8,8 @@ export const signInWithGoogle = async () => {
   });
 
   if (error) {
-    console.error("Google Sign-In Error:", error.message);
+    toast.error("Google Sign-In Error:");
+    console.log("Google Sign-In Error:", error);
   }
 
   return data;
@@ -17,6 +19,7 @@ export const signInWithGoogle = async () => {
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error("Sign-out error:", error.message);
+    toast.error("Sign-out error:");
+    console.log("Sign-out error:", error);
   }
 };

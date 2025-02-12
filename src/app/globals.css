@@ -24,5 +24,15 @@
     rgba(0, 0, 0, 0) 100%
   );
   opacity: 0.3;
-  filter: blur(5px);
+  filter: blur(20px);
+}
+
+.custom-check {
+  border-radius: 50%;
+  border: 1px solid #000;
+  width: 20px;
+}
+
+input[type="checkbox"]:checked + .custom-check {
+  background-color: #000;
 }

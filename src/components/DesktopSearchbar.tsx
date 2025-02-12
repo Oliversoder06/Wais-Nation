@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { searchSpotify } from "@/lib/spotify";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const SearchBar: React.FC = () => {
   const [query, setQuery] = useState<string>("");
@@ -20,7 +21,8 @@ const SearchBar: React.FC = () => {
             setResults(data.tracks.items);
             setShowResults(true); // Show results when fetching is done
           } catch (error) {
-            console.error("Error during Spotify search:", error);
+            toast.error("Error during Spotify search:");
+            console.log("Error during Spotify search: ", error);
           }
         })();
       }, 300);
@@ -69,16 +71,25 @@ const SearchBar: React.FC = () => {
           {results.map((track: any) => (
             <Link href={`/track/${track.id}`} key={track.id} passHref>
               <div
-                className="p-2 hover:bg-[#2a2830] cursor-pointer"
+                className="p-2 hover:bg-[#2a2830] cursor-pointer flex items-center gap-2"
                 onClick={() => {
-                  setQuery(""); // Reset input after clicking a track
-                  setShowResults(false); // Hide results after selection
+                  setQuery("");
+                  setShowResults(false);
                 }}
               >
-                <p className="font-semibold text-white">{track.name}</p>
-                <p className="text-sm text-nit">
-                  {track.artists.map((artist: any) => artist.name).join(", ")}
-                </p>
+                <img
+                  src={track.album.images[0].url}
+                  alt="album cover"
+                  width={40}
+                  height={40}
+                  className="rounded"
+                />
+                <div>
+                  <p className="font-semibold text-white">{track.name}</p>
+                  <p className="text-sm text-nit">
+                    {track.artists.map((artist: any) => artist.name).join(", ")}
+                  </p>
+                </div>
               </div>
             </Link>
           ))}

@@ -5,6 +5,8 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { SignInButton, useAuth } from "@clerk/nextjs";
+import { createPlaylist } from "@/lib/playlists";
+import toast from "react-hot-toast";
 
 interface Playlist {
   id: string;
@@ -30,7 +32,8 @@ const Playlists: React.FC = () => {
         .select("id, name, description, user_id");
 
       if (error) {
-        console.error("Error fetching playlists:", error.message);
+        toast.error("Error fetching playlists:");
+        console.log("Error fetching playlists: ", error);
       } else {
         setPlaylists(data || []);
       }
@@ -39,31 +42,31 @@ const Playlists: React.FC = () => {
     fetchPlaylists();
   }, []);
 
-  const createPlaylist = async () => {
-    if (!isSignedIn || !userId || !playlistName.trim()) {
-      console.error("User not logged in or invalid input");
+  const handleCreatePlaylist = async () => {
+    if (!isSignedIn || !userId || !playlistName || !playlistName.trim()) {
+      toast.error("User not logged in or invalid input");
       return;
     }
 
-    const newPlaylist = {
-      name: playlistName,
-      description: playlistDescription,
-      user_id: userId,
-    };
+    const newPlaylist = await createPlaylist(
+      userId,
+      playlistName,
+      playlistDescription
+    );
 
-    const { data, error } = await supabase
-      .from("playlists")
-      .insert([newPlaylist])
-      .select();
-
-    if (error) {
-      console.error("Error creating playlist:", error.message);
-    } else if (data) {
-      setPlaylists((prev) => [...prev, ...data]);
+    if (newPlaylist) {
+      setPlaylists((prev) => [...prev, ...newPlaylist]);
       setShowModal(false);
       setPlaylistName("");
       setPlaylistDescription("");
     }
+    toast.success("Playlist created successfully");
+  };
+
+  const handleDeletePlaylist = (playlistId: string) => {
+    setPlaylists((prev) =>
+      prev.filter((playlist) => playlist.id !== playlistId)
+    );
   };
 
   return (
@@ -170,7 +173,7 @@ const Playlists: React.FC = () => {
             <div className="flex justify-center gap-4">
               <button
                 className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
-                onClick={createPlaylist}
+                onClick={handleCreatePlaylist}
               >
                 Save
               </button>
@@ -198,12 +201,12 @@ const Playlists: React.FC = () => {
                 <span className="text-white text-lg font-semibold w-[24px] text-right">
                   {index + 1}
                 </span>
-                {/* <LongPlaylistCard playlistId="3cEYpjA9oz9GiPac4AsH4n?locale=en-US%2Cen%3Bq%3D0.9%2Csv%3Bq%3D0.8%2Cen-GB%3Bq%3D0.7" /> */}
                 <LongPlaylistCard
-                  owner="Wais Music"
+                  owner="You"
                   name={playlist.name}
                   description={playlist.description}
                   id={playlist.id}
+                  onDelete={() => handleDeletePlaylist(playlist.id)}
                 />
               </div>
             ))}
