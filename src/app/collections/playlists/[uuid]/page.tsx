@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
 import toast from "react-hot-toast";
-import { getTrackDetails } from "@/lib/spotify";
 
 interface Playlist {
   id: string;
@@ -110,8 +109,18 @@ export default function PlaylistPage() {
           {playlist.description || "No description available"}
         </p>
       </div>
-
-      <div className="flex flex-col gap-4 mx-[40px]">
+      <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
+        <div className="flex flex-col gap-1">
+          <div className="flex px-[16px]">
+            <h1 className="text-nit xl:w-[35%] md:w-[50%] w-full">Tracks</h1>
+            <h1 className="text-nit xl:w-[35%] md:w-[50%] hidden md:flex">
+              Album
+            </h1>
+            <h1 className=" text-nit xl:w-[20%] xl:block hidden">Date Added</h1>
+            <h1 className=" text-nit text-end xl:w-[10%]">Duration</h1>
+          </div>
+          <div className="w-full h-[1px] bg-[#2e2e2e]" />
+        </div>
         {track.length === 0 ? (
           <p className="text-gray-400 text-center">
             No tracks added to this playlist yet.

@@ -70,148 +70,293 @@ const Playlists: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Header Section */}
-      <div className="h-[calc(30vh)] bg-gradient-to-t from-[#026F69] to-[#0E0E0E] flex justify-center gap-[64px] mt-[40px]">
-        <div className="size-[248px] bg-gradient-to-br from-[#00FF99] to-[#026F69] rounded-[24px] flex items-center justify-center">
+    <div>
+      {/* DEKSTOP VIEW */}
+      <div className="flex-col gap-8 hidden md:flex">
+        {/* Header Section */}
+        <div className="h-[calc(30vh)] bg-gradient-to-t from-[#026F69] to-[#0E0E0E] flex justify-center gap-[64px] mt-[40px]">
           <Image
-            src="/icons/playlist.svg"
-            alt="playlist icon"
-            width={84}
-            height={84}
+            src="/icons/PlaylistPage.svg"
+            alt="heart"
+            width={248}
+            height={248}
           />
+          <div className="flex flex-col justify-center gap-[8px]">
+            <h1 className="text-white font-black text-[64px]">
+              Your Playlists
+            </h1>
+            <h1 className="text-[#ABAABB] text-[20px] font-medium">
+              {
+                playlists.filter((playlist) => playlist.user_id === userId)
+                  .length
+              }{" "}
+              playlists
+            </h1>
+          </div>
         </div>
-        <div className="flex flex-col justify-center gap-[8px]">
-          <h1 className="text-white font-black text-[64px]">Your Playlists</h1>
-          <h1 className="text-[#ABAABB] text-[20px] font-medium">
-            {playlists.filter((playlist) => playlist.user_id === userId).length}{" "}
-            playlists
-          </h1>
-        </div>
-      </div>
 
-      {/* Create Playlist Button */}
-      <div className="flex items-center justify-end mr-[40px]">
-        {isSignedIn ? (
-          <Image
-            src="/icons/create-plus.svg"
-            alt="Create New Playlist"
-            width={64}
-            height={64}
-            className="cursor-pointer"
-            onClick={() => setShowModal(true)}
-          />
+        {/* Create Playlist Button */}
+        <div className="flex items-center justify-end mr-[40px]">
+          {isSignedIn ? (
+            <Image
+              src="/icons/create-plus.svg"
+              alt="Create New Playlist"
+              width={64}
+              height={64}
+              className="cursor-pointer"
+              onClick={() => setShowModal(true)}
+            />
+          ) : (
+            <p className="text-[#ABAABB]">
+              <SignInButton>
+                <span className="cursor-pointer hover:underline text-blue-500">
+                  Sign in
+                </span>
+              </SignInButton>{" "}
+              to create playlists
+            </p>
+          )}
+        </div>
+
+        {/* Modal for Creating Playlist */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+            <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+              <div className="flex justify-between">
+                <h2 className="text-white text-2xl font-bold">
+                  Create New Playlist
+                </h2>
+                <Image
+                  src="/icons/cross.svg"
+                  alt="cross icon"
+                  width={28}
+                  height={28}
+                  className="cursor-pointer self-end"
+                  onClick={() => setShowModal(false)}
+                />
+              </div>
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  placeholder="Playlist Name"
+                  value={playlistName}
+                  maxLength={50}
+                  onChange={(e) => setPlaylistName(e.target.value)}
+                  className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141]"
+                />
+                {playlistName.length > 0 &&
+                  (playlistName.length < 50 ? (
+                    <span className="text-[#ABAABB] text-sm text-right">
+                      {playlistName.length}/50
+                    </span>
+                  ) : (
+                    <span className="text-[#ff1616] text-sm text-right">
+                      {playlistName.length}/50
+                    </span>
+                  ))}
+              </div>
+              <div className="flex flex-col">
+                <textarea
+                  placeholder="Playlist Description"
+                  value={playlistDescription}
+                  onChange={(e) => setPlaylistDescription(e.target.value)}
+                  maxLength={100}
+                  className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141] resize-none"
+                ></textarea>
+                {/* Character Counter */}
+                {playlistDescription.length > 0 &&
+                  (playlistDescription.length < 100 ? (
+                    <span className="text-[#ABAABB] text-sm text-right">
+                      {playlistDescription.length}/100
+                    </span>
+                  ) : (
+                    <span className="text-[#ff1616] text-sm text-right">
+                      {playlistDescription.length}/100
+                    </span>
+                  ))}
+              </div>
+              <div className="flex justify-center gap-4">
+                <button
+                  className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
+                  onClick={handleCreatePlaylist}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Playlists Display */}
+        {loading ? (
+          <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
+            Loading playlists...
+          </span>
+        ) : playlists.filter((playlist) => playlist.user_id === userId).length <
+          1 ? (
+          <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
+            Looks pretty empty.
+          </span>
         ) : (
-          <p className="text-[#ABAABB]">
-            <SignInButton>
-              <span className="cursor-pointer hover:underline text-blue-500">
-                Sign in
-              </span>
-            </SignInButton>{" "}
-            to create playlists
-          </p>
+          <div className="flex flex-col gap-4 mx-[40px]">
+            {playlists
+              .filter((playlist) => playlist.user_id === userId) // Filter playlists by userId
+              .map((playlist, index) => (
+                <div key={playlist.id} className="flex items-center gap-4">
+                  <span className="text-white text-lg font-semibold w-[24px] text-right">
+                    {index + 1}
+                  </span>
+                  <LongPlaylistCard
+                    owner="You"
+                    name={playlist.name}
+                    description={playlist.description}
+                    id={playlist.id}
+                    onDelete={() => handleDeletePlaylist(playlist.id)}
+                  />
+                </div>
+              ))}
+          </div>
         )}
       </div>
 
-      {/* Modal for Creating Playlist */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-          <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
-            <div className="flex justify-between">
-              <h2 className="text-white text-2xl font-bold">
-                Create New Playlist
-              </h2>
-              <Image
-                src="/icons/cross.svg"
-                alt="cross icon"
-                width={28}
-                height={28}
-                className="cursor-pointer self-end"
-                onClick={() => setShowModal(false)}
-              />
-            </div>
-            <div className="flex flex-col">
-              <input
-                type="text"
-                placeholder="Playlist Name"
-                value={playlistName}
-                maxLength={50}
-                onChange={(e) => setPlaylistName(e.target.value)}
-                className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141]"
-              />
-              {playlistName.length > 0 &&
-                (playlistName.length < 50 ? (
-                  <span className="text-[#ABAABB] text-sm text-right">
-                    {playlistName.length}/50
-                  </span>
-                ) : (
-                  <span className="text-[#ff1616] text-sm text-right">
-                    {playlistName.length}/50
-                  </span>
-                ))}
-            </div>
-            <div className="flex flex-col">
-              <textarea
-                placeholder="Playlist Description"
-                value={playlistDescription}
-                onChange={(e) => setPlaylistDescription(e.target.value)}
-                maxLength={100}
-                className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141] resize-none"
-              ></textarea>
-              {/* Character Counter */}
-              {playlistDescription.length > 0 &&
-                (playlistDescription.length < 100 ? (
-                  <span className="text-[#ABAABB] text-sm text-right">
-                    {playlistDescription.length}/100
-                  </span>
-                ) : (
-                  <span className="text-[#ff1616] text-sm text-right">
-                    {playlistDescription.length}/100
-                  </span>
-                ))}
-            </div>
-            <div className="flex justify-center gap-4">
-              <button
-                className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
-                onClick={handleCreatePlaylist}
-              >
-                Save
-              </button>
-            </div>
+      {/* MOBILE VIEW */}
+      <div className="flex flex-col md:hidden px-[16px]">
+        <div className="flex justify-between w-full items-center">
+          <div className="flex flex-col">
+            <span className="font-bold text-white text-[24px]">Playlists</span>
+            <span className="text-nit">
+              {
+                playlists.filter((playlist) => playlist.user_id === userId)
+                  .length
+              }{" "}
+              playlists
+            </span>
           </div>
+          <Image src="/icons/play.svg" alt="play" width={48} height={48} />
         </div>
-      )}
+      </div>
 
       {/* Playlists Display */}
-      {loading ? (
-        <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
-          Loading playlists...
-        </span>
-      ) : playlists.filter((playlist) => playlist.user_id === userId).length <
-        1 ? (
-        <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
-          Looks pretty empty.
-        </span>
-      ) : (
-        <div className="flex flex-col gap-4 mx-[40px]">
-          {playlists
-            .filter((playlist) => playlist.user_id === userId) // Filter playlists by userId
-            .map((playlist, index) => (
-              <div key={playlist.id} className="flex items-center gap-4">
-                <span className="text-white text-lg font-semibold w-[24px] text-right">
-                  {index + 1}
+      <div className="flex flex-col gap-4 px-[16px] mt-4">
+        {loading ? (
+          <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
+            Loading playlists...
+          </span>
+        ) : playlists.filter((playlist) => playlist.user_id === userId).length <
+          1 ? (
+          <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
+            Looks pretty empty.
+          </span>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {playlists
+              .filter((playlist) => playlist.user_id === userId) // Filter playlists by userId
+              .map((playlist) => (
+                <div key={playlist.id} className="flex items-center gap-2">
+                  <LongPlaylistCard
+                    owner="You"
+                    name={playlist.name}
+                    description={playlist.description}
+                    id={playlist.id}
+                    onDelete={() => handleDeletePlaylist(playlist.id)}
+                  />
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* Create Playlist Button */}
+        <div className="flex justify-center">
+          {isSignedIn ? (
+            <Image
+              src="/icons/create-plus.svg"
+              alt="Create New Playlist"
+              width={64}
+              height={64}
+              className="cursor-pointer"
+              onClick={() => setShowModal(true)}
+            />
+          ) : (
+            <p className="text-[#ABAABB]">
+              <SignInButton>
+                <span className="cursor-pointer hover:underline text-blue-500">
+                  Sign in
                 </span>
-                <LongPlaylistCard
-                  owner="You"
-                  name={playlist.name}
-                  description={playlist.description}
-                  id={playlist.id}
-                  onDelete={() => handleDeletePlaylist(playlist.id)}
-                />
+              </SignInButton>{" "}
+              to create playlists
+            </p>
+          )}
+
+          {/* Modal for Creating Playlist */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+              <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+                <div className="flex justify-between">
+                  <h2 className="text-white text-2xl font-bold">
+                    Create New Playlist
+                  </h2>
+                  <Image
+                    src="/icons/cross.svg"
+                    alt="cross icon"
+                    width={28}
+                    height={28}
+                    className="cursor-pointer self-end"
+                    onClick={() => setShowModal(false)}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <input
+                    type="text"
+                    placeholder="Playlist Name"
+                    value={playlistName}
+                    maxLength={50}
+                    onChange={(e) => setPlaylistName(e.target.value)}
+                    className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141]"
+                  />
+                  {playlistName.length > 0 &&
+                    (playlistName.length < 50 ? (
+                      <span className="text-[#ABAABB] text-sm text-right">
+                        {playlistName.length}/50
+                      </span>
+                    ) : (
+                      <span className="text-[#ff1616] text-sm text-right">
+                        {playlistName.length}/50
+                      </span>
+                    ))}
+                </div>
+                <div className="flex flex-col">
+                  <textarea
+                    placeholder="Playlist Description"
+                    value={playlistDescription}
+                    onChange={(e) => setPlaylistDescription(e.target.value)}
+                    maxLength={100}
+                    className="p-2 rounded-md bg-[#414141] text-white outline-none focus:border-[#636363] border-[2px] border-[#414141] resize-none"
+                  ></textarea>
+                  {/* Character Counter */}
+                  {playlistDescription.length > 0 &&
+                    (playlistDescription.length < 100 ? (
+                      <span className="text-[#ABAABB] text-sm text-right">
+                        {playlistDescription.length}/100
+                      </span>
+                    ) : (
+                      <span className="text-[#ff1616] text-sm text-right">
+                        {playlistDescription.length}/100
+                      </span>
+                    ))}
+                </div>
+                <div className="flex justify-center gap-4">
+                  <button
+                    className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
+                    onClick={handleCreatePlaylist}
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
-            ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

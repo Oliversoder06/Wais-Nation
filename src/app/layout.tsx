@@ -6,6 +6,8 @@ import DesktopSearchbar from "@/components/DesktopSearchbar";
 import MusicPlayer from "@/components/MusicPlayer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
+import MobileNav from "@/components/MobileNav";
+import MobileHeader from "@/components/MobileHeader";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,9 +22,18 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="bg-background flex">
-          <Sidebar />
-          <main className="ml-[144px] w-[calc(100%-508px)] pb-[120px]">
+        <body className="bg-background flex flex-col md:flex-row">
+          <div className="md:hidden w-full">
+            <div className="h-[30px] w-full" />
+            <MobileHeader />
+          </div>
+          <div className="hidden md:flex">
+            <Sidebar />
+          </div>
+          <div className="md:hidden">
+            <MobileNav />
+          </div>
+          <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] pb-[120px]">
             <nav className="py-[20px]">
               <DesktopSearchbar />
             </nav>

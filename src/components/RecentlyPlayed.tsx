@@ -3,7 +3,7 @@ import RecentlyPlayedCard from "./RecentlyPlayedCard";
 
 const RecentlyPlayed = () => {
   return (
-    <div className="grid grid-cols-3 gap-[16px] justify-center items-center my-[40px]">
+    <div className="flex flex-wrap md:gap-4 gap-[8px] max-w-[1000px] justify-center">
       <RecentlyPlayedCard />
       <RecentlyPlayedCard />
       <RecentlyPlayedCard />

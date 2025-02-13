@@ -97,9 +97,10 @@ export default function LongSongCard({
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center gap-[140px] px-[16px]"
+        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center px-[16px] gap-16"
       >
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
+          {/* COVER IMAGE */}
           {cover ? (
             <img
               src={cover}
@@ -117,36 +118,44 @@ export default function LongSongCard({
               className="rounded-md"
             />
           )}
-          <div className="flex flex-col leading-[24px]">
-            <span className="text-white text-[20px] font-semibold w-[350px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+
+          {/* TRACK AND ARTIST */}
+          <div className="flex flex-col leading-[24px] overflow-hidden">
+            <span className="text-white font-semibold overflow-hidden text-ellipsis">
               {title}
             </span>
-            <span className="text-[#ABAAB8] text-[16px]">{artist}</span>
+            <span className="text-[#ABAAB8] text-[16px] overflow-hidden text-ellipsis">
+              {artist}
+            </span>
           </div>
         </div>
-        <span className="text-[#ABAABB] w-[350px] truncate whitespace-nowrap overflow-hidden text-ellipsis">
+
+        <span className="text-[#ABAABB]  xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex">
           {album}
         </span>
-        <div className="flex gap-4 items-center justify-between w-full">
-          <span className="text-[#ABAABB]">{date}</span>
-          <div className="flex items-center gap-4 relative">
-            <span
-              className={`text-[#ABAABB] pr-[16px] ${isHovered && "opacity-0"}`}
-            >
-              {duration}
-            </span>
-            {isHovered && (
-              <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
-                <Image
-                  src="/icons/create-plus.svg"
-                  alt="Menu"
-                  width={36}
-                  height={36}
-                  onClick={handleAddToPlaylist}
-                />
-              </div>
-            )}
-          </div>
+
+        <span className="text-[#ABAABB] xl:w-[20%] hidden xl:block">
+          {date}
+        </span>
+        <div className="flex items-center gap-4 relative xl:w-[10%] justify-end">
+          <span
+            className={`text-[#ABAABB] pr-[16px] text-nowrap ${
+              isHovered && "opacity-0"
+            }`}
+          >
+            {duration}
+          </span>
+          {isHovered && (
+            <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
+              <Image
+                src="/icons/create-plus.svg"
+                alt="Menu"
+                width={36}
+                height={36}
+                onClick={handleAddToPlaylist}
+              />
+            </div>
+          )}
         </div>
       </div>
       {showModal && (

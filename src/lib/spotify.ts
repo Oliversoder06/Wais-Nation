@@ -33,12 +33,18 @@ export async function getSpotifyToken(): Promise<string> {
   }
 }
 
-export async function searchSpotify(query: string): Promise<any> {
+export async function searchSpotify({
+  query,
+  limit,
+}: {
+  query: string;
+  limit: any;
+}): Promise<any> {
   try {
     const token = await getSpotifyToken();
     console.log("Searching Spotify for:", query);
     const response = await fetch(
-      `https://api.spotify.com/v1/search?offset=0&limit=10&q=${encodeURIComponent(
+      `https://api.spotify.com/v1/search?offset=0&limit=${limit}&q=${encodeURIComponent(
         query
       )}&type=track`,
       {

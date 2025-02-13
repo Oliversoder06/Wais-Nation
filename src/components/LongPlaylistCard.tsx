@@ -40,7 +40,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
     <div className="relative w-full">
       <Link
         href={id ? `/collections/playlists/${id}` : "#"}
-        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative"
+        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[96px] md:h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative"
       >
         <div className="flex gap-4 items-center">
           {/* Playlist Image Placeholder */}
@@ -50,6 +50,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
             width={104}
             height={104}
             unoptimized={true}
+            className="md:w-[104px] md:h-[104px] w-[64px] h-[64px]"
           />
 
           {/* Playlist Info */}
@@ -60,7 +61,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
                 {owner}
               </span>
             </div>
-            <span className="text-[#6E6D78] text-[14px]">
+            <span className="text-[#6E6D78] text-[14px] hidden md:flex">
               {description || "No description available"}
             </span>
           </div>
@@ -129,7 +130,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
         )}
       </div>
       {isDeleting && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
           <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <h2 className="text-white text-[24px]">

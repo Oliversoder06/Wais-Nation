@@ -4,8 +4,8 @@ import React from "react";
 
 const Homepage = () => {
   return (
-    <div className="mx-[40px] mb-[40px] flex flex-col gap-16">
-      <div className="flex items-center justify-center flex-col">
+    <div className="md:mx-[40px] mx-[12px] mb-[40px] flex flex-col gap-16">
+      <div className="flex items-center justify-center w-full">
         <RecentlyPlayed />
       </div>
       <div>

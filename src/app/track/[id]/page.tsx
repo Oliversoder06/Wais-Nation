@@ -40,8 +40,8 @@ export default function TrackPage({ params }: TrackPageProps) {
             backgroundImage: `url(${track.album.images[0].url})`,
           }}
         />
-        <div className="relative flex justify-center items-center gap-[64px] h-full">
-          <div className="size-[248px] rounded-[24px]">
+        <div className="relative flex justify-center items-center md:gap-[64px] gap-[32px] h-full">
+          <div className="md:size-[248px] size-[200px] rounded-[24px] flex items-center justify-center">
             <img
               src={track.album.images[0].url}
               alt={track.name}
@@ -53,20 +53,31 @@ export default function TrackPage({ params }: TrackPageProps) {
           <div className="flex flex-col justify-center gap-[8px] text-white">
             <h1
               title={track.name}
-              className="font-black text-[48px] max-w-[900px]  overflow-hidden text-ellipsis"
+              className="font-black text-[32px] md:text-[48px] max-w-[900px]  overflow-hidden text-ellipsis"
             >
               {track.name}
             </h1>
             <h1
               title={track.name}
-              className="text-[#ABAABB]  text-[20px] font-medium"
+              className="text-[#ABAABB] md:text-[20px] font-medium"
             >
               {track.artists.map((artist: any) => artist.name).join(", ")}
             </h1>
           </div>
         </div>
       </div>
-      <div className="mx-[40px]">
+      <div className="md:mx-[40px] mx-[12px] flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex px-[16px]">
+            <h1 className="text-nit xl:w-[35%] md:w-[50%] w-full">Tracks</h1>
+            <h1 className="text-nit xl:w-[35%] md:w-[50%] hidden md:flex">
+              Album
+            </h1>
+            <h1 className=" text-nit xl:w-[20%] xl:block hidden">Released</h1>
+            <h1 className=" text-nit text-end xl:w-[10%]">Duration</h1>
+          </div>
+          <div className="w-full h-[1px] bg-[#2e2e2e]" />
+        </div>
         <LongSongCard
           title={track.name}
           artist={track.artists.map((artist: any) => artist.name).join(", ")}
