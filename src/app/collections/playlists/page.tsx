@@ -237,7 +237,7 @@ const Playlists: React.FC = () => {
       </div>
 
       {/* Playlists Display */}
-      <div className="flex flex-col gap-4 px-[16px] mt-4">
+      <div className="flex flex-col gap-4 px-[16px] mt-4 md:hidden">
         {loading ? (
           <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
             Loading playlists...
