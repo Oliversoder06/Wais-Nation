@@ -96,7 +96,7 @@ export default function PlaylistPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pb-[50px]">
       <div className="flex flex-col items-center mt-10 text-white">
         <Image
           src="/images/playlist.svg"

@@ -39,7 +39,7 @@ export default function RootLayout({
             <DesktopSearchbar />
           </nav>
           {/* Main Content Area */}
-          <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] h-[calc(100vh-100px)] md:pt-[64px] md:px-[8px] min-h-screen pb-[75px]">
+          <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] h-[calc(100vh-25px)] md:pt-[64px] md:px-[8px] pb-[75px]">
             <div className="md:bg-[#1D1C24] rounded-lg h-full w-full md:overflow-y-auto scrollbar ">
               {children}
             </div>
