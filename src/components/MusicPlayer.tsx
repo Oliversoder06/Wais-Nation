@@ -9,7 +9,7 @@ const MusicPlayer = () => {
     setIsPlaying(!isPlaying);
   };
   return (
-    <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden">
+    <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
       <div className="flex gap-[20px]">
         <div className="size-[56px] bg-red-500" />
         <div className="flex flex-col justify-center">

@@ -4,7 +4,7 @@ import React from "react";
 
 const Homepage = () => {
   return (
-    <div className="md:mx-[40px] mx-[12px] mb-[40px] flex flex-col gap-16">
+    <div className="md:mx-[40px] mx-[12px] flex flex-col gap-16 mt-[40px] md:pb-[50px] pb-[100px]">
       <div className="flex items-center justify-center w-full">
         <RecentlyPlayed />
       </div>

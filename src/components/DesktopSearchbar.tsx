@@ -11,7 +11,6 @@ const SearchBar: React.FC = () => {
   const [results, setResults] = useState<any[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  const [mobileSearch, setMobileSearch] = useState<boolean>(false);
 
   useEffect(() => {
     if (query.length > 2) {
@@ -49,16 +48,9 @@ const SearchBar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleMobileSearch = () => {
-    setMobileSearch(!mobileSearch);
-  };
-
   return (
-    <div>
-      <div
-        ref={searchRef}
-        className="relative justify-self-center z-10 hidden md:flex"
-      >
+    <div className="fixed top-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-50">
+      <div ref={searchRef} className="relative hidden md:flex">
         <input
           type="text"
           value={query}
@@ -72,10 +64,10 @@ const SearchBar: React.FC = () => {
           alt="search"
           width={20}
           height={20}
-          className="absolute top-[50%] left-[12px] transform translate-y-[-50%]"
+          className="absolute top-[50%] left-[12px] transform -translate-y-1/2"
         />
         {showResults && results.length > 0 && (
-          <div className="absolute top-full left-0 right-0 bg-[#151418] shadow-lg rounded mt-2 max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 bg-[#151418] shadow-lg rounded mt-2 max-h-60 overflow-y-auto scrollbar z-[1000]">
             {results.map((track: any) => (
               <Link href={`/track/${track.id}`} key={track.id} passHref>
                 <div

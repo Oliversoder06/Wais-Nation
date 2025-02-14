@@ -28,7 +28,7 @@ const Sideplayer = () => {
         {open && (
           <div>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-10"
+              className="fixed inset-0 bg-black bg-opacity-50"
               onClick={handleOpen}
             ></div>
             <div className="w-[364px] bg-gradient-to-t from-background to-[#17493B] fixed right-0 h-[calc(100vh-100px)] flex flex-col justify-end p-[20px] gap-[40px] z-40">
@@ -55,7 +55,7 @@ const Sideplayer = () => {
           </div>
         )}
       </div>
-      <div className="w-[364px] bg-gradient-to-t from-background to-[#17493B] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[40px] hidden">
+      <div className="w-[364px] bg-gradient-to-t from-[#1D1C24] to-[#17493B] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[40px] hidden rounded-bl-lg">
         <div className="flex items-center justify-between">
           <div className="flex flex-col leading-[32px]">
             <span className="text-white font-semibold text-[32px]">sEXY</span>

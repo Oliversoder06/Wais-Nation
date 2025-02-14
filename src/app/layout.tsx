@@ -16,31 +16,42 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="bg-background flex flex-col md:flex-row">
-          <div className="md:hidden w-full">
-            <div className="h-[30px] w-full" />
+        <body className="bg-[#1D1C24] md:bg-background flex flex-col md:flex-row">
+          {/* Mobile Header/Navigation */}
+          {/* <div className="md:hidden w-full">
+            <div className="w-full" />
             <MobileHeader />
-          </div>
+          </div> */}
           <div className="hidden md:flex">
             <Sidebar />
           </div>
           <div className="md:hidden">
             <MobileNav />
           </div>
-          <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] pb-[120px]">
-            <nav className="py-[20px]">
-              <DesktopSearchbar />
-            </nav>
-            {children}
+
+          <nav>
+            <DesktopSearchbar />
+          </nav>
+          {/* Main Content Area */}
+          <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] h-[calc(100vh-100px)] md:pt-[64px] md:px-[8px] min-h-screen pb-[75px]">
+            <div className="md:bg-[#1D1C24] rounded-lg h-full w-full md:overflow-y-auto scrollbar ">
+              {children}
+            </div>
           </main>
-          <Sideplayer />
+
+          {/* Sideplayer Area */}
+          <div className="overflow-y-auto overscroll-contain">
+            <Sideplayer />
+          </div>
+
           <MusicPlayer />
+
           <Toaster />
         </body>
       </html>

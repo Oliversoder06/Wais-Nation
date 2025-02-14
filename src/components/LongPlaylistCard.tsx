@@ -40,7 +40,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
     <div className="relative w-full">
       <Link
         href={id ? `/collections/playlists/${id}` : "#"}
-        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[96px] md:h-[140px] rounded-[8px] flex items-center justify-between px-[16px] pr-[32px] relative"
+        className="bg-[#2c2a36] hover:bg-[#32303d] cursor-pointer w-full h-[96px] md:h-[120px] rounded-[8px] flex items-center justify-between px-[8px] pr-[32px] "
       >
         <div className="flex gap-4 items-center">
           {/* Playlist Image Placeholder */}

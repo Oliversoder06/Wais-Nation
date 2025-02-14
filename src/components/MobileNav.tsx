@@ -8,7 +8,7 @@ const MobileNav = () => {
   const pathname = usePathname();
 
   return (
-    <div className="bg-[#1D1C24] h-[100px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">
+    <div className="bg-[#1D1C24] h-[80px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">
       <Link href="/" className="flex flex-col gap-[8px] items-center">
         <Image
           src={
@@ -17,10 +17,14 @@ const MobileNav = () => {
               : "/icons/mobile/mobile-home.svg"
           }
           alt="home"
-          width={32}
-          height={32}
+          width={28}
+          height={28}
         />
-        <span className={pathname === "/" ? "text-white" : "text-[#ABAAB8]"}>
+        <span
+          className={`${
+            pathname === "/" ? "text-white" : "text-[#ABAAB8]"
+          } text-[12px]`}
+        >
           Home
         </span>
       </Link>
@@ -32,11 +36,13 @@ const MobileNav = () => {
               : "/icons/mobile/mobile-search.svg"
           }
           alt="library"
-          width={32}
-          height={32}
+          width={28}
+          height={28}
         />
         <span
-          className={pathname === "/search" ? "text-white" : "text-[#ABAAB8]"}
+          className={`${
+            pathname === "/search" ? "text-white" : "text-[#ABAAB8]"
+          } text-[12px]`}
         >
           Search
         </span>
@@ -52,15 +58,15 @@ const MobileNav = () => {
               : "/icons/mobile/mobile-library.svg"
           }
           alt="library"
-          width={32}
-          height={32}
+          width={28}
+          height={28}
         />
         <span
-          className={
+          className={`${
             pathname === "/collections/playlists"
               ? "text-white"
               : "text-[#ABAAB8]"
-          }
+          } text-[12px]`}
         >
           Library
         </span>
@@ -76,13 +82,15 @@ const MobileNav = () => {
               : "/icons/mobile/mobile-liked.svg"
           }
           alt="liked"
-          width={32}
-          height={32}
+          width={28}
+          height={28}
         />
         <span
-          className={
-            pathname === "/collections/liked" ? "text-white" : "text-[#ABAAB8]"
-          }
+          className={`${
+            pathname === "/collections/playlists"
+              ? "text-white"
+              : "text-[#ABAAB8]"
+          } text-[12px]`}
         >
           Liked
         </span>

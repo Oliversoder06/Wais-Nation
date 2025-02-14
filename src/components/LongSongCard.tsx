@@ -1,5 +1,6 @@
 "use client";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -34,6 +35,7 @@ export default function LongSongCard({
   const [loading, setLoading] = useState<boolean>(true);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
+  const { userId } = useAuth();
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -97,7 +99,7 @@ export default function LongSongCard({
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-[#151418] hover:bg-[#2a2830] cursor-pointer w-full h-[92px] rounded-[8px] flex items-center px-[16px] gap-16"
+        className="bg-[#2c2a36] md:hover:bg-[#32303d] cursor-pointer w-full md:h-[92px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16"
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
           {/* COVER IMAGE */}
@@ -176,47 +178,50 @@ export default function LongSongCard({
             <div className="flex flex-col">
               {loading ? (
                 <div className="loader flex justify-self-center" />
-              ) : playlists.length === 0 ? (
+              ) : playlists.filter((playlist) => playlist.user_id === userId)
+                  .length === 0 ? (
                 <p className="text-nit text-center">Looks pretty empty.</p>
               ) : (
-                playlists.map((playlist) => (
-                  <div key={playlist.id} className="flex flex-col gap-4">
-                    <label
-                      htmlFor={playlist.id}
-                      className="text-white cursor-pointer w-full p-5 flex items-center justify-between bg-[#2b2b2b] rounded-md transition hover:bg-[#3a3a3a]"
-                    >
-                      <p className="max-w-[90%]">{playlist.name}</p>
-
-                      <input
-                        type="checkbox"
-                        id={playlist.id}
-                        className="hidden peer"
-                        checked={selectedPlaylists.includes(playlist.id)}
-                        onChange={() => handleCheckboxChange(playlist.id)}
-                      />
-
+                playlists
+                  .filter((playlist) => playlist.user_id === userId)
+                  .map((playlist) => (
+                    <div key={playlist.id} className="flex flex-col gap-4">
                       <label
                         htmlFor={playlist.id}
-                        className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
+                        className="text-white cursor-pointer w-full p-5 flex items-center justify-between bg-[#2b2b2b] rounded-md transition hover:bg-[#3a3a3a]"
                       >
-                        <svg
-                          className="hidden"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
+                        <p className="max-w-[90%]">{playlist.name}</p>
+
+                        <input
+                          type="checkbox"
+                          id={playlist.id}
+                          className="hidden peer"
+                          checked={selectedPlaylists.includes(playlist.id)}
+                          onChange={() => handleCheckboxChange(playlist.id)}
+                        />
+
+                        <label
+                          htmlFor={playlist.id}
+                          className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          ></path>
-                        </svg>
+                          <svg
+                            className="hidden"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            ></path>
+                          </svg>
+                        </label>
                       </label>
-                    </label>
-                  </div>
-                ))
+                    </div>
+                  ))
               )}
             </div>
             <button
