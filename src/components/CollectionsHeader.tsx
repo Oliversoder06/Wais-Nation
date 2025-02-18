@@ -16,7 +16,7 @@ const CollectionsHeader = ({
   return (
     <div>
       <div
-        className={`h-[calc(20vh)] bg-gradient-to-t ${gradient} flex flex-col md:flex-row md:justify-center items-center md:gap-[40px] gap-[32px] `}
+        className={`h-[calc(20vh)] bg-gradient-to-t ${gradient} flex flex-col md:flex-row md:justify-center items-center md:gap-[40px] gap-[32px] pt-8`}
       >
         <Image
           src={`/icons/${image}Page.svg`}

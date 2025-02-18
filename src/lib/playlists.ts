@@ -56,7 +56,7 @@ export const createPlaylist = async (
     return null;
   }
 
-  return data; // Return created playlist
+  return data;
 };
 
 export const deletePlaylist = async (playlistId: string) => {
@@ -77,4 +77,29 @@ export const deletePlaylist = async (playlistId: string) => {
 
   console.log("Playlist deleted successfully");
   return true;
+};
+export const updatePlaylist = async (
+  playlistId: string,
+  name: string,
+  description: string
+) => {
+  if (!playlistId || !name.trim()) {
+    console.error("Invalid playlist ID or name");
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("playlists")
+    .update({ name, description })
+    .eq("id", playlistId)
+    .select(); // Ensure we return the updated record
+
+  if (error) {
+    console.error("Error updating playlist:", error.message);
+    return false;
+  }
+
+  console.log("Playlist updated successfully");
+  // Return the first (and likely only) updated record
+  return data && data.length ? data[0] : false;
 };

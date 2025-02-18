@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
 import toast from "react-hot-toast";
+import { updatePlaylist } from "@/lib/playlists";
 
 interface Playlist {
   id: string;
@@ -30,6 +31,10 @@ export default function PlaylistPage() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [track, setTrack] = useState<Track[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [editing, setEditing] = useState<boolean>(false);
+  // State for the editable fields
+  const [playlistName, setPlaylistName] = useState<string>("");
+  const [playlistDescription, setPlaylistDescription] = useState<string>("");
 
   useEffect(() => {
     if (!uuid) {
@@ -86,6 +91,32 @@ export default function PlaylistPage() {
     );
   }
 
+  async function handleUpdatePlaylist(name: string, description: string) {
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+
+    const data = await updatePlaylist(uuid, name, description);
+    if (!data) {
+      toast.error("Error updating playlist");
+      return;
+    }
+
+    setPlaylist(data);
+    setEditing(false);
+    toast.success("Playlist updated successfully");
+  }
+
+  // When editing, pre-fill the input fields with the current playlist values
+  const handleEdit = () => {
+    if (playlist) {
+      setPlaylistName(playlist.name);
+      setPlaylistDescription(playlist.description || "");
+    }
+    setEditing(true);
+  };
+
   function formatDate(isoString: string): string {
     const date = new Date(isoString);
     return date.toLocaleDateString("en-US", {
@@ -97,7 +128,10 @@ export default function PlaylistPage() {
 
   return (
     <div className="flex flex-col gap-8 pb-[50px]">
-      <div className="flex flex-col items-center mt-10 text-white">
+      <div
+        className="flex flex-col items-center mt-10 text-white cursor-pointer"
+        onClick={handleEdit}
+      >
         <Image
           src="/images/playlist.svg"
           alt="Playlist Image"
@@ -109,6 +143,75 @@ export default function PlaylistPage() {
           {playlist.description || "No description available"}
         </p>
       </div>
+
+      {editing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-[#1D1C24] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+            <div className="flex justify-between">
+              <h2 className="text-white text-2xl font-bold">Update Playlist</h2>
+              <Image
+                src="/icons/cross.svg"
+                alt="cross icon"
+                width={28}
+                height={28}
+                className="cursor-pointer self-end"
+                onClick={() => setEditing(false)}
+              />
+            </div>
+            <div className="flex flex-col">
+              <input
+                type="text"
+                placeholder="Playlist Name"
+                value={playlistName}
+                maxLength={50}
+                onChange={(e) => setPlaylistName(e.target.value)}
+                className="p-2 rounded-md bg-[#282731] text-white outline-none focus:border-[#383646] border-[2px] border-[#282731]"
+              />
+              {playlistName.length > 0 &&
+                (playlistName.length < 50 ? (
+                  <span className="text-[#ABAABB] text-sm text-right">
+                    {playlistName.length}/50
+                  </span>
+                ) : (
+                  <span className="text-[#ff1616] text-sm text-right">
+                    {playlistName.length}/50
+                  </span>
+                ))}
+            </div>
+            <div className="flex flex-col">
+              <textarea
+                placeholder="Playlist Description"
+                value={playlistDescription}
+                onChange={(e) => setPlaylistDescription(e.target.value)}
+                maxLength={100}
+                className="p-2 rounded-md bg-[#282731] text-white outline-none focus:border-[#383646] border-[2px] border-[#282731] resize-none"
+              ></textarea>
+              {/* Character Counter */}
+              {playlistDescription.length > 0 &&
+                (playlistDescription.length < 100 ? (
+                  <span className="text-[#ABAABB] text-sm text-right">
+                    {playlistDescription.length}/100
+                  </span>
+                ) : (
+                  <span className="text-[#ff1616] text-sm text-right">
+                    {playlistDescription.length}/100
+                  </span>
+                ))}
+            </div>
+            <div className="flex justify-center gap-4">
+              <button
+                className="px-8 py-2 bg-white text-black font-semibold rounded-md hover:bg-[#E5E5E5]"
+                onClick={() =>
+                  handleUpdatePlaylist(playlistName, playlistDescription)
+                }
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
         <div className="flex flex-col gap-1">
           <div className="flex px-[16px]">

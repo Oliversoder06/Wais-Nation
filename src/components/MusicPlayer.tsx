@@ -28,7 +28,7 @@ const MusicPlayer = () => {
             alt="prev song"
             width={24}
             height={24}
-            className="cursor-pointer hover:opacity-80"
+            className="cursor-pointer hover:opacity-80 w-auto h-auto"
           />
           <Image
             src={isPlaying ? "/icons/pause.svg" : "/icons/play.svg"}
@@ -36,14 +36,14 @@ const MusicPlayer = () => {
             width={36}
             height={36}
             onClick={handlePlayPause}
-            className="cursor-pointer hover:opacity-80"
+            className="cursor-pointer hover:opacity-80 "
           />
           <Image
-            src="/icons/nextsong.svg"
-            alt="next song"
+            src="/icons/prevsong.svg"
+            alt="prev song"
             width={24}
             height={24}
-            className="cursor-pointer hover:opacity-80"
+            className="cursor-pointer hover:opacity-80 w-auto h-auto rotate-180"
           />
         </div>
         <div className="flex">
@@ -56,14 +56,14 @@ const MusicPlayer = () => {
           alt="loop song"
           width={24}
           height={24}
-          className="cursor-pointer hover:opacity-80"
+          className="cursor-pointer hover:opacity-80 w-auto h-auto"
         />
         <Image
           src="/icons/volume.svg"
           alt="volume"
           width={24}
           height={24}
-          className="cursor-pointer hover:opacity-80"
+          className="cursor-pointer hover:opacity-80 w-auto h-auto"
         />
       </div>
     </div>
