@@ -41,17 +41,17 @@ const MusicPlayer = () => {
           <div className="w-[56px] h-[56px] bg-red-500" />
         )}
         <div className="flex flex-col justify-center">
-          <span className="text-white font-semibold text-[24px] hover:underline cursor-pointer truncate max-w-[200px]">
+          <span className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]">
             {currentSong?.title || "No Song"}
           </span>
-          <span className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer">
+          <span className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]">
             {currentSong?.artist || "Unknown Artist"}
           </span>
         </div>
       </div>
 
       {/* Middle: Playback Controls */}
-      <div className="flex flex-col w-[50%] gap-[20px]">
+      <div className="flex flex-col w-[50%] gap-[20px] absolute left-1/2 transform -translate-x-1/2">
         <div className="flex gap-[28px] self-center">
           <Image
             src="/icons/prevsong.svg"
