@@ -1,22 +1,25 @@
-import fetch from "node-fetch";
+// lib/youtube.ts
+const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY; // now public
+const BASE_URL = "https://www.googleapis.com/youtube/v3/search";
 
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY!;
+export const searchYouTube = async (query: string) => {
+  try {
+    // Combine query with "audio" properly:
+    const fullQuery = encodeURIComponent(`${query} audio`);
 
-export const fetchYouTubeVideos = async (songs: any[]) => {
-  const results = await Promise.all(
-    songs.map(async (song) => {
-      const query = `${song.title} ${song.artist} official audio`;
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-          query
-        )}&maxResults=1&type=video&key=${YOUTUBE_API_KEY}`
-      );
-      const data = (await response.json()) as {
-        items: { id: { videoId: string } }[];
-      };
-      return { ...song, youtubeId: data.items[0]?.id?.videoId };
-    })
-  );
+    const response = await fetch(
+      `${BASE_URL}?part=snippet&q=${fullQuery}&type=video&key=${API_KEY}&maxResults=1`
+    );
 
-  return results;
+    const data = await response.json();
+    console.log("YouTube API response:", data);
+
+    if (!data.items || data.items.length === 0) return null;
+
+    // Return the first video's ID
+    return data.items[0].id.videoId;
+  } catch (error) {
+    console.error("YouTube API Error:", error);
+    return null;
+  }
 };

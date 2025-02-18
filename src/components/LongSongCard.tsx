@@ -4,6 +4,8 @@ import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { searchYouTube } from "@/lib/youtube"; // your YouTube search function
+import { usePlayer } from "./PlayerContext";
 
 interface LongSongCardProps {
   title: string;
@@ -30,6 +32,7 @@ export default function LongSongCard({
   duration,
   cover,
 }: LongSongCardProps) {
+  // Existing state for hover, playlists, and modal
   const [isHovered, setIsHovered] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,13 +40,15 @@ export default function LongSongCard({
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
   const { userId } = useAuth();
 
+  // Get the global player setter
+  const { setCurrentSong } = usePlayer();
+
   useEffect(() => {
     const fetchPlaylists = async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("playlists")
         .select("id, name, description, user_id");
-
       if (error) {
         toast.error("Error fetching playlists:");
         console.log("Error fetching playlists: ", error);
@@ -72,18 +77,16 @@ export default function LongSongCard({
       toast.error("Select at least one playlist.");
       return;
     }
-
     const { error } = await supabase.from("playlist_tracks").insert(
       selectedPlaylists.map((playlistId) => ({
         playlist_id: playlistId,
-        title: title,
-        artist: artist,
-        album: album,
-        duration: duration,
-        cover: cover,
+        title,
+        artist,
+        album,
+        duration,
+        cover,
       }))
     );
-
     if (error) {
       console.error("Error adding track to playlists:", error);
       toast.error("Failed to add track.");
@@ -94,8 +97,21 @@ export default function LongSongCard({
     }
   };
 
+  // When the card is clicked, search YouTube and update the global player
+  const handleCardClick = async () => {
+    if (showModal) return;
+    const query = `${title} ${artist}`;
+    const ytId = await searchYouTube(query);
+    if (ytId) {
+      // Set the current song in the global player
+      setCurrentSong({ title, artist, album, cover, videoId: ytId });
+    } else {
+      console.log("No video id available for playback");
+    }
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full" onClick={handleCardClick}>
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -132,7 +148,7 @@ export default function LongSongCard({
           </div>
         </div>
 
-        <span className="text-[#ABAABB]  xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex">
+        <span className="text-[#ABAABB] xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex">
           {album}
         </span>
 
@@ -154,14 +170,21 @@ export default function LongSongCard({
                 alt="Menu"
                 width={36}
                 height={36}
-                onClick={handleAddToPlaylist}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToPlaylist();
+                }}
               />
             </div>
           )}
         </div>
       </div>
+
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
+        >
           <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
             <div className="flex justify-between">
               <h2 className="text-white text-2xl font-bold">Add to Playlist</h2>
@@ -174,7 +197,6 @@ export default function LongSongCard({
                 onClick={() => setShowModal(false)}
               />
             </div>
-
             <div className="flex flex-col">
               {loading ? (
                 <div className="loader flex justify-self-center" />
@@ -191,7 +213,6 @@ export default function LongSongCard({
                         className="text-white cursor-pointer w-full p-5 flex items-center justify-between bg-[#2b2b2b] rounded-md transition hover:bg-[#3a3a3a]"
                       >
                         <p className="max-w-[90%]">{playlist.name}</p>
-
                         <input
                           type="checkbox"
                           id={playlist.id}
@@ -199,7 +220,6 @@ export default function LongSongCard({
                           checked={selectedPlaylists.includes(playlist.id)}
                           onChange={() => handleCheckboxChange(playlist.id)}
                         />
-
                         <label
                           htmlFor={playlist.id}
                           className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
