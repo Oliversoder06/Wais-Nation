@@ -84,7 +84,7 @@ const SearchBar: React.FC = () => {
           onFocus={() => setShowResults(true)}
         />
         <Image
-          src="/icons/search.svg"
+          src="/icons/searchicon.svg"
           alt="search"
           width={20}
           height={20}
