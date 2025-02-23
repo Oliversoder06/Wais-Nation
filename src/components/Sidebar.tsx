@@ -12,7 +12,7 @@ const Sidebar = () => {
       <div className="h-[calc(100vh-100px)] w-[144px] bg-[#1D1C24] flex items-center justify-between flex-col py-[28px] rounded-br-lg">
         <Link href="/">
           <Image
-            src="/images/logo.svg"
+            src="/images/Logo.svg"
             alt="logo"
             width={64}
             height={64}
@@ -20,14 +20,14 @@ const Sidebar = () => {
           />
         </Link>
         <div className="bg-[#2F2E36] h-[240px] gap-[8px] rounded-[12px] flex flex-col justify-center items-center">
-          <NavigationItem icon="/icons/home.svg" alt="home" anchor="/" />
+          <NavigationItem icon="/icons/Home.svg" alt="home" anchor="/" />
           <NavigationItem
-            icon="/icons/heart.svg"
+            icon="/icons/Heart.svg"
             alt="liked"
             anchor="/collections/liked"
           />
           <NavigationItem
-            icon="/icons/playlist.svg"
+            icon="/icons/Playlist.svg"
             alt="playlist"
             anchor="/collections/playlists"
           />

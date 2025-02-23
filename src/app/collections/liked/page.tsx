@@ -11,7 +11,7 @@ const Liked = () => {
       <div className="hidden md:flex flex-col gap-8 md:pb-[50px] ">
         <CollectionsHeader
           gradient="from-[#1D1C24] to-[#0E3B2D]"
-          image="likedtracks"
+          image="LikedTracks"
           text="Liked Songs"
           type={`${amount} Songs`}
         />

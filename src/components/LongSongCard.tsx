@@ -126,7 +126,7 @@ export default function LongSongCard({
             />
           ) : (
             <Image
-              src="/images/playlist.svg"
+              src="/images/Playlist.svg"
               alt="Song Cover"
               width={48}
               height={48}

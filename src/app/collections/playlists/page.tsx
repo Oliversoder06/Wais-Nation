@@ -82,7 +82,7 @@ const Playlists: React.FC = () => {
 
         <CollectionsHeader
           gradient="from-[#1D1C24] to-[#104344]"
-          image="playlist"
+          image="Playlist"
           text="Your Playlists"
           type={`${amount} playlists`}
         />
