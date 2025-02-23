@@ -1,5 +1,47 @@
 const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
 const clientSecret = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET!;
+
+// Define interfaces for Spotify API responses
+
+interface SpotifyImage {
+  height: number;
+  width: number;
+  url: string;
+}
+
+interface SpotifyAlbum {
+  album_type: string;
+  id: string;
+  name: string;
+  images: SpotifyImage[];
+}
+
+interface SpotifyArtist {
+  id: string;
+  name: string;
+}
+
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  album: SpotifyAlbum;
+  artists: SpotifyArtist[];
+  duration_ms: number;
+  // Add other properties if needed
+}
+
+export interface SpotifySearchResponse {
+  tracks: {
+    href: string;
+    items: SpotifyTrack[];
+    limit: number;
+    next: string | null;
+    offset: number;
+    previous: string | null;
+    total: number;
+  };
+}
+
 export async function getSpotifyToken(): Promise<string> {
   try {
     if (!clientId || !clientSecret) {
@@ -38,8 +80,8 @@ export async function searchSpotify({
   limit,
 }: {
   query: string;
-  limit: any;
-}): Promise<any> {
+  limit: number;
+}): Promise<SpotifySearchResponse | null> {
   try {
     const token = await getSpotifyToken();
     console.log("Searching Spotify for:", query);
@@ -60,7 +102,7 @@ export async function searchSpotify({
       throw new Error(`Failed to search Spotify: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: SpotifySearchResponse = await response.json();
     console.log("Search results:", data);
     return data;
   } catch (error) {
@@ -69,7 +111,9 @@ export async function searchSpotify({
   }
 }
 
-export async function getTrackDetails(trackId: string): Promise<any> {
+export async function getTrackDetails(
+  trackId: string
+): Promise<SpotifyTrack | null> {
   try {
     const token = await getSpotifyToken();
     const response = await fetch(
@@ -86,7 +130,7 @@ export async function getTrackDetails(trackId: string): Promise<any> {
       throw new Error(`Failed to get track details: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data: SpotifyTrack = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching track details:", error);

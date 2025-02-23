@@ -1,11 +1,13 @@
+// src/components/LongSongCard.tsx
 "use client";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { searchYouTube } from "@/lib/youtube"; // your YouTube search function
+import { searchYouTube } from "@/lib/youtube";
 import { usePlayer } from "./PlayerContext";
+import AddToPlaylistModal from "@/components/AddToPlaylistModal";
 
 interface LongSongCardProps {
   title: string;
@@ -32,7 +34,6 @@ export default function LongSongCard({
   duration,
   cover,
 }: LongSongCardProps) {
-  // Existing state for hover, playlists, and modal
   const [isHovered, setIsHovered] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -40,7 +41,6 @@ export default function LongSongCard({
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
   const { userId } = useAuth();
 
-  // Get the global player setter
   const { setCurrentSong } = usePlayer();
 
   useEffect(() => {
@@ -97,13 +97,11 @@ export default function LongSongCard({
     }
   };
 
-  // When the card is clicked, search YouTube and update the global player
   const handleCardClick = async () => {
     if (showModal) return;
     const query = `${title} ${artist}`;
     const ytId = await searchYouTube(query);
     if (ytId) {
-      // Set the current song in the global player
       setCurrentSong({ title, artist, album, cover, videoId: ytId });
     } else {
       console.log("No video id available for playback");
@@ -118,9 +116,8 @@ export default function LongSongCard({
         className="bg-[#2c2a36] md:hover:bg-[#32303d] cursor-pointer w-full md:h-[92px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16"
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
-          {/* COVER IMAGE */}
           {cover ? (
-            <img
+            <Image
               src={cover}
               alt={title}
               width={56}
@@ -128,7 +125,7 @@ export default function LongSongCard({
               className="rounded-[8px]"
             />
           ) : (
-            <img
+            <Image
               src="/images/playlist.svg"
               alt="Song Cover"
               width={48}
@@ -136,8 +133,6 @@ export default function LongSongCard({
               className="rounded-md"
             />
           )}
-
-          {/* TRACK AND ARTIST */}
           <div className="flex flex-col leading-[24px] overflow-hidden">
             <span className="text-white font-semibold overflow-hidden text-ellipsis">
               {title}
@@ -147,11 +142,9 @@ export default function LongSongCard({
             </span>
           </div>
         </div>
-
         <span className="text-[#ABAABB] xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex">
           {album}
         </span>
-
         <span className="text-[#ABAABB] xl:w-[20%] hidden xl:block">
           {date}
         </span>
@@ -164,16 +157,18 @@ export default function LongSongCard({
             {duration}
           </span>
           {isHovered && (
-            <div className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10">
+            <div
+              className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToPlaylist();
+              }}
+            >
               <Image
                 src="/icons/create-plus.svg"
                 alt="Menu"
                 width={36}
                 height={36}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToPlaylist();
-                }}
               />
             </div>
           )}
@@ -181,77 +176,15 @@ export default function LongSongCard({
       </div>
 
       {showModal && (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1000]"
-        >
-          <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
-            <div className="flex justify-between">
-              <h2 className="text-white text-2xl font-bold">Add to Playlist</h2>
-              <Image
-                src="/icons/cross.svg"
-                alt="cross icon"
-                width={28}
-                height={28}
-                className="cursor-pointer self-end"
-                onClick={() => setShowModal(false)}
-              />
-            </div>
-            <div className="flex flex-col">
-              {loading ? (
-                <div className="loader flex justify-self-center" />
-              ) : playlists.filter((playlist) => playlist.user_id === userId)
-                  .length === 0 ? (
-                <p className="text-nit text-center">Looks pretty empty.</p>
-              ) : (
-                playlists
-                  .filter((playlist) => playlist.user_id === userId)
-                  .map((playlist) => (
-                    <div key={playlist.id} className="flex flex-col gap-4">
-                      <label
-                        htmlFor={playlist.id}
-                        className="text-white cursor-pointer w-full p-5 flex items-center justify-between bg-[#2b2b2b] rounded-md transition hover:bg-[#3a3a3a]"
-                      >
-                        <p className="max-w-[90%]">{playlist.name}</p>
-                        <input
-                          type="checkbox"
-                          id={playlist.id}
-                          className="hidden peer"
-                          checked={selectedPlaylists.includes(playlist.id)}
-                          onChange={() => handleCheckboxChange(playlist.id)}
-                        />
-                        <label
-                          htmlFor={playlist.id}
-                          className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
-                        >
-                          <svg
-                            className="hidden"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5 13l4 4L19 7"
-                            ></path>
-                          </svg>
-                        </label>
-                      </label>
-                    </div>
-                  ))
-              )}
-            </div>
-            <button
-              onClick={handleAddTracksToPlaylists}
-              className="bg-[#00FF99] text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]"
-            >
-              Add to Playlist
-            </button>
-          </div>
-        </div>
+        <AddToPlaylistModal
+          playlists={playlists}
+          loading={loading}
+          selectedPlaylists={selectedPlaylists}
+          userId={userId ?? null}
+          handleCheckboxChange={handleCheckboxChange}
+          handleAddTracksToPlaylists={handleAddTracksToPlaylists}
+          closeModal={() => setShowModal(false)}
+        />
       )}
     </div>
   );

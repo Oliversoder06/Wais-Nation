@@ -4,11 +4,11 @@ import React, { useRef } from "react";
 import YouTube from "react-youtube";
 import { usePlayer } from "./PlayerContext";
 
-const MusicPlayer = () => {
+const MusicPlayer: React.FC = () => {
   const { currentSong, isPlaying, togglePlay } = usePlayer();
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<YT.Player | null>(null);
 
-  const handlePlayerReady = (event: any) => {
+  const handlePlayerReady = (event: YT.PlayerEvent) => {
     playerRef.current = event.target;
   };
 

@@ -4,6 +4,25 @@ import { getTrackDetails } from "@/lib/spotify";
 import { useState, useEffect, use } from "react";
 import { notFound } from "next/navigation";
 import LongSongCard from "@/components/LongSongCard";
+import Image from "next/image";
+
+interface Artist {
+  name: string;
+}
+
+interface Album {
+  images: { url: string }[];
+  name: string;
+  release_date: string;
+}
+
+interface Track {
+  id: string;
+  name: string;
+  album: Album;
+  artists: Artist[];
+  duration_ms: number;
+}
 
 interface TrackPageProps {
   params: Promise<{ id: string }>;
@@ -11,11 +30,11 @@ interface TrackPageProps {
 
 export default function TrackPage({ params }: TrackPageProps) {
   const { id: trackId } = use(params);
-  const [track, setTrack] = useState<any>(null);
+  const [track, setTrack] = useState<Track | null>(null);
 
   useEffect(() => {
     const fetchTrack = async () => {
-      const data = await getTrackDetails(trackId);
+      const data = (await getTrackDetails(trackId)) as Track | null;
       if (!data) return notFound();
       setTrack(data);
     };
@@ -42,7 +61,7 @@ export default function TrackPage({ params }: TrackPageProps) {
         />
         <div className="relative flex justify-center items-center md:gap-[64px] gap-[32px] h-full">
           <div className="md:size-[248px] size-[200px] rounded-[24px] flex items-center justify-center">
-            <img
+            <Image
               src={track.album.images[0].url}
               alt={track.name}
               width={300}
@@ -53,7 +72,7 @@ export default function TrackPage({ params }: TrackPageProps) {
           <div className="flex flex-col justify-center gap-[8px] text-white">
             <h1
               title={track.name}
-              className="font-black text-[32px] md:text-[48px] max-w-[900px]  overflow-hidden text-ellipsis"
+              className="font-black text-[32px] md:text-[48px] max-w-[900px] overflow-hidden text-ellipsis"
             >
               {track.name}
             </h1>
@@ -61,7 +80,7 @@ export default function TrackPage({ params }: TrackPageProps) {
               title={track.name}
               className="text-[#ABAABB] md:text-[20px] font-medium"
             >
-              {track.artists.map((artist: any) => artist.name).join(", ")}
+              {track.artists.map((artist: Artist) => artist.name).join(", ")}
             </h1>
           </div>
         </div>
@@ -73,14 +92,14 @@ export default function TrackPage({ params }: TrackPageProps) {
             <h1 className="text-nit xl:w-[35%] md:w-[50%] hidden md:flex">
               Album
             </h1>
-            <h1 className=" text-nit xl:w-[20%] xl:block hidden">Released</h1>
-            <h1 className=" text-nit text-end xl:w-[10%]">Duration</h1>
+            <h1 className="text-nit xl:w-[20%] xl:block hidden">Released</h1>
+            <h1 className="text-nit text-end xl:w-[10%]">Duration</h1>
           </div>
           <div className="w-full h-[1px] bg-[#2e2e2e]" />
         </div>
         <LongSongCard
           title={track.name}
-          artist={track.artists.map((artist: any) => artist.name).join(", ")}
+          artist={track.artists.map((artist: Artist) => artist.name).join(", ")}
           album={track.album.name}
           date={track.album.release_date}
           duration={formatDuration(track.duration_ms)}

@@ -11,7 +11,7 @@ const Sidebar = () => {
     <div className="fixed hidden md:flex">
       <div className="h-[calc(100vh-100px)] w-[144px] bg-[#1D1C24] flex items-center justify-between flex-col py-[28px] rounded-br-lg">
         <Link href="/">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="logo"
             width={64}

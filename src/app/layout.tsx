@@ -7,7 +7,7 @@ import MusicPlayer from "@/components/MusicPlayer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import MobileNav from "@/components/MobileNav";
-import MobileHeader from "@/components/MobileHeader";
+// import MobileHeader from "@/components/MobileHeader";
 import { PlayerProvider } from "@/components/PlayerContext";
 
 export const metadata: Metadata = {

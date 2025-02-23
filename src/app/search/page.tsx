@@ -5,9 +5,30 @@ import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-const page: React.FC = () => {
+interface Artist {
+  name: string;
+}
+
+interface Album {
+  images: { url: string }[];
+}
+
+export interface Track {
+  id: string;
+  name: string;
+  album: Album;
+  artists: Artist[];
+}
+
+interface SearchResult {
+  tracks: {
+    items: Track[];
+  };
+}
+
+const Page: React.FC = () => {
   const [query, setQuery] = useState<string>("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Track[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -16,7 +37,10 @@ const page: React.FC = () => {
       const debounceTimeout = setTimeout(() => {
         (async () => {
           try {
-            const data = await searchSpotify({ query, limit: 20 });
+            const data = (await searchSpotify({
+              query,
+              limit: 20,
+            })) as SearchResult;
             setResults(data.tracks.items);
             setShowResults(true);
           } catch (error) {
@@ -72,7 +96,7 @@ const page: React.FC = () => {
           />
           {showResults && results.length > 0 && (
             <div className="absolute top-full left-0 right-0  shadow-lg rounded mt-2 h-auto overflow-y-auto">
-              {results.map((track: any) => (
+              {results.map((track: Track) => (
                 <Link href={`/track/${track.id}`} key={track.id} passHref>
                   <div
                     className="p-2 hover:bg-[#2a2830] cursor-pointer flex items-center gap-2"
@@ -81,7 +105,7 @@ const page: React.FC = () => {
                       setShowResults(false);
                     }}
                   >
-                    <img
+                    <Image
                       src={track.album.images[0].url}
                       alt="album cover"
                       width={40}
@@ -92,13 +116,14 @@ const page: React.FC = () => {
                       <p className="font-semibold text-white">{track.name}</p>
                       <p className="text-sm text-nit">
                         {track.artists
-                          .map((artist: any) => artist.name)
+                          .map((artist: Artist) => artist.name)
                           .join(", ")}
                       </p>
                     </div>
                   </div>
                 </Link>
               ))}
+
               <div className="w-full h-[100px]" />
             </div>
           )}
@@ -108,4 +133,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default Page;

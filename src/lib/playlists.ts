@@ -1,25 +1,23 @@
-import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { supabase } from "./supabase";
 
-// Create a new playlist
+// Create a new playlist track association
 export const addTrackToPlaylist = async (
   playlistId: string,
-  trackId: string
+  trackId: string,
+  userId: string
 ) => {
-  const { user } = useUser();
-
-  if (!user) {
+  if (!userId) {
     throw new Error("User not authenticated");
   }
 
   const { data, error } = await supabase
     .from("playlist_tracks")
-    .insert([{ playlist_id: playlistId, track_id: trackId, user_id: user.id }]);
+    .insert([{ playlist_id: playlistId, track_id: trackId, user_id: userId }]);
+
   if (error) {
     toast.error("Error adding track to playlist");
-    toast.error("Error adding track: ");
-    console.log("Error adding track: ", error);
+    console.error("Error adding track: ", error);
     throw error;
   }
 
@@ -28,6 +26,7 @@ export const addTrackToPlaylist = async (
   return data;
 };
 
+// Create a new playlist
 export const createPlaylist = async (
   userId: string | null,
   name?: string,
@@ -52,13 +51,14 @@ export const createPlaylist = async (
 
   if (error) {
     toast.error("Error creating playlist:");
-    console.log("Error creating playlist: ", error);
+    console.error("Error creating playlist: ", error);
     return null;
   }
 
   return data;
 };
 
+// Delete a playlist by its ID
 export const deletePlaylist = async (playlistId: string) => {
   if (!playlistId) {
     console.error("Invalid playlist ID");
@@ -78,6 +78,8 @@ export const deletePlaylist = async (playlistId: string) => {
   console.log("Playlist deleted successfully");
   return true;
 };
+
+// Update a playlist's name and description
 export const updatePlaylist = async (
   playlistId: string,
   name: string,
@@ -92,7 +94,7 @@ export const updatePlaylist = async (
     .from("playlists")
     .update({ name, description })
     .eq("id", playlistId)
-    .select(); // Ensure we return the updated record
+    .select(); // Return the updated record
 
   if (error) {
     console.error("Error updating playlist:", error.message);

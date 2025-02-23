@@ -192,7 +192,7 @@ const Playlists: React.FC = () => {
           <div className="flex flex-col gap-4 mx-[40px]">
             {playlists
               .filter((playlist) => playlist.user_id === userId) // Filter playlists by userId
-              .map((playlist, index) => (
+              .map((playlist) => (
                 <div key={playlist.id} className="flex items-center gap-4">
                   <LongPlaylistCard
                     owner="You"

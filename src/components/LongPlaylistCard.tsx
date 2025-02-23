@@ -73,7 +73,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
         ref={menuRef}
         role="button"
         tabIndex={0}
-        onClick={(e) => {
+        onClick={() => {
           setIsOpen(!isOpen);
         }}
         className="absolute top-1/2 right-6 transform -translate-y-1/2 flex items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
