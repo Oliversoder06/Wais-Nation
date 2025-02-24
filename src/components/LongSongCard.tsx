@@ -141,7 +141,13 @@ export default function LongSongCard({
               <span></span>
             </div>
           ) : (
-            <span className="text-[#ABAABB]  text-nowrap">{duration}</span>
+            <span
+              className={`${
+                isCurrentSong ? "text-[#22aa84]" : "text-white"
+              }  text-nowrap`}
+            >
+              {duration}
+            </span>
           )}
 
           {/* ✅ Keep the "Create Plus" Menu on Hover */}
@@ -158,7 +164,9 @@ export default function LongSongCard({
                 alt="Menu"
                 width={36}
                 height={36}
-                className="bg-[#32303d] rounded-full"
+                className={`${
+                  isCurrentSong ? "bg-green-900" : "bg-[#32303d]"
+                } rounded-full`}
               />
             </div>
           )}

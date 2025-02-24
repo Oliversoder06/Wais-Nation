@@ -7,15 +7,8 @@ import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 
 const MusicPlayer: React.FC = () => {
-  const {
-    currentTrack,
-    playPrevious,
-    playNext,
-    isPlaying,
-    togglePlay,
-    queue,
-    history,
-  } = useMusicStore();
+  const { currentTrack, playPrevious, playNext, isPlaying, togglePlay, queue } =
+    useMusicStore();
 
   const playerRef = useRef<YT.Player | null>(null);
 
@@ -76,8 +69,10 @@ const MusicPlayer: React.FC = () => {
             alt="prev song"
             width={24}
             height={24}
-            className={`cursor-pointer hover:opacity-80 w-auto h-auto ${
-              history.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            className={` w-auto h-auto ${
+              queue.length === 0
+                ? "opacity-100 hover:opacity-80 cursor-pointer"
+                : "opacity-50 hover:opacity-40"
             }`}
             onClick={playPrevious}
           />
@@ -96,8 +91,10 @@ const MusicPlayer: React.FC = () => {
             alt="next song"
             width={24}
             height={24}
-            className={`cursor-pointer hover:opacity-80 w-auto h-auto ${
-              queue.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            className={`w-auto h-auto ${
+              queue.length === 0
+                ? "opacity-50 hover:opacity-40"
+                : "opacity-100 hover:opacity-80 cursor-pointer"
             }`}
             onClick={playNext}
           />
