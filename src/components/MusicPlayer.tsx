@@ -5,6 +5,7 @@ import YouTube from "react-youtube";
 import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 import Link from "next/link";
+import { searchSpotify } from "@/lib/spotify";
 
 const MusicPlayer: React.FC = () => {
   const {
@@ -20,11 +21,50 @@ const MusicPlayer: React.FC = () => {
   const playerRef = useRef<YT.Player | null>(null);
   // Lift volume state to MusicPlayer
   const [volume, setVolume] = useState(50);
+  const [spotifyTrackId, setSpotifyTrackId] = useState<string | null>(null);
+  const [artistId, setArtistId] = useState<string | null>(null);
 
   useEffect(() => {
     if (playerRef.current && currentTrack) {
       playerRef.current.loadVideoById(currentTrack.videoId);
     }
+  }, [currentTrack]);
+
+  // Fetch the correct Spotify ID and Artist ID when a new track plays
+  useEffect(() => {
+    async function fetchSpotifyId() {
+      if (currentTrack) {
+        try {
+          // Create a search query based on track title and artist
+          const query = `${currentTrack.title} ${currentTrack.artist}`;
+          // Search Spotify for the track
+          const searchResults = await searchSpotify({ query, limit: 1 });
+          if (
+            searchResults &&
+            searchResults.tracks.items &&
+            searchResults.tracks.items.length > 0
+          ) {
+            // Use the first result's Spotify track ID
+            const spotifyTrack = searchResults.tracks.items[0];
+            setSpotifyTrackId(spotifyTrack.id);
+            // Also store the first artist's ID, if available
+            if (spotifyTrack.artists && spotifyTrack.artists.length > 0) {
+              setArtistId(spotifyTrack.artists[0].id);
+            } else {
+              setArtistId(null);
+            }
+          } else {
+            setSpotifyTrackId(null);
+            setArtistId(null);
+          }
+        } catch (error) {
+          console.error("Error fetching Spotify track/artist ID:", error);
+          setSpotifyTrackId(null);
+          setArtistId(null);
+        }
+      }
+    }
+    fetchSpotifyId();
   }, [currentTrack]);
 
   const handlePlayPause = () => {
@@ -37,6 +77,7 @@ const MusicPlayer: React.FC = () => {
       togglePlay();
     }
   };
+
   return (
     <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
       {/* Left Side: Song Info */}
@@ -57,7 +98,7 @@ const MusicPlayer: React.FC = () => {
         <div className="flex flex-col justify-center">
           {currentTrack ? (
             <Link
-              href={`/track/${currentTrack.spotifyTrackId}`}
+              href={`/track/${spotifyTrackId || "unknown"}`}
               className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]"
             >
               {currentTrack.title || "No Song"}
@@ -67,9 +108,18 @@ const MusicPlayer: React.FC = () => {
               No Song
             </span>
           )}
-          <span className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]">
-            {currentTrack?.artist || "Unknown Artist"}
-          </span>
+          {currentTrack ? (
+            <Link
+              href={`/artist/${artistId || "unknown"}`}
+              className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]"
+            >
+              {currentTrack.artist || "Unknown Artist"}
+            </Link>
+          ) : (
+            <span className="text-[#ABAAB8] font-semibold truncate max-w-[200px]">
+              Unknown Artist
+            </span>
+          )}
         </div>
       </div>
 

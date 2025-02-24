@@ -10,6 +10,7 @@ interface SpotifyImage {
 }
 
 interface SpotifyAlbum {
+  release_date: string;
   album_type: string;
   id: string;
   name: string;
@@ -131,6 +132,71 @@ export async function getTrackDetails(
     return data;
   } catch (error) {
     console.error("Error fetching track details:", error);
+    return null;
+  }
+}
+
+export interface SpotifyArtistDetails {
+  id: string;
+  name: string;
+  genres: string[];
+  images: { url: string }[];
+  followers: { total: number };
+  popularity: number;
+}
+
+export async function getArtistDetails(
+  artistId: string
+): Promise<SpotifyArtistDetails | null> {
+  try {
+    const token = await getSpotifyToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/artists/${artistId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get artist details: ${response.statusText}`);
+    }
+
+    const data: SpotifyArtistDetails = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching artist details:", error);
+    return null;
+  }
+}
+
+export async function getArtistTopTracks(
+  artistId: string
+): Promise<SpotifyTrack[] | null> {
+  try {
+    const token = await getSpotifyToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get artist top tracks: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    return data.tracks as SpotifyTrack[];
+  } catch (error) {
+    console.error("Error fetching artist top tracks:", error);
     return null;
   }
 }
