@@ -1,17 +1,22 @@
 "use client";
-import { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 
 interface VolumeControlProps {
   playerRef: React.MutableRefObject<YT.Player | null>;
+  volume: number;
+  setVolume: (volume: number) => void;
 }
 
-const VolumeControl: React.FC<VolumeControlProps> = ({ playerRef }) => {
-  const [volume, setVolume] = useState(50);
-  const [lastVolume, setLastVolume] = useState(50);
+const VolumeControl: React.FC<VolumeControlProps> = ({
+  playerRef,
+  volume,
+  setVolume,
+}) => {
+  const [lastVolume, setLastVolume] = React.useState(volume);
   const showSlider = true;
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (playerRef.current) {
       playerRef.current.setVolume(volume);
     }
