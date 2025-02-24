@@ -71,3 +71,76 @@ input[type="checkbox"]:checked + .custom-check {
 
   /* Darker grey for hover effect */
 }
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 5px;
+  background: #4d4d4d; /* Gray background */
+  border-radius: 10px;
+  outline: none;
+  transition: background 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Track styling */
+.volume-slider::-webkit-slider-runnable-track {
+  height: 5px;
+  background: #4d4d4d; /* Default gray track */
+  border-radius: 10px;
+}
+
+.volume-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #ffffff var(--progress),
+    #4d4d4d var(--progress)
+  );
+}
+
+/* Thumb (Hidden by default) */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: transparent; /* Invisible */
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+  margin-top: -4px;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: transparent; /* Invisible */
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Hover Effects */
+.volume-slider:hover::-webkit-slider-thumb {
+  background: #ffffff; /* Thumb becomes visible */
+  transform: scale(1.2);
+}
+
+.volume-slider:hover::-moz-range-thumb {
+  background: #ffffff; /* Thumb becomes visible */
+  transform: scale(1.2);
+}
+
+.volume-slider:hover::-moz-range-progress {
+  background: #1db954; /* Active part turns green */
+}
+
+.volume-slider:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #00ff99 var(--progress),
+    #4d4d4d var(--progress)
+  );
+}

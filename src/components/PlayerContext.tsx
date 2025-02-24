@@ -1,6 +1,5 @@
-// PlayerContext.tsx
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 
 interface Song {
   title: string;
@@ -15,6 +14,7 @@ interface PlayerContextType {
   isPlaying: boolean;
   setCurrentSong: (song: Song) => void;
   togglePlay: () => void;
+  playerRef: React.MutableRefObject<YT.Player | null>;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -24,10 +24,11 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [currentSong, setCurrentSongState] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const playerRef = useRef<YT.Player | null>(null);
 
   const setCurrentSong = (song: Song) => {
     setCurrentSongState(song);
-    setIsPlaying(true); // auto-play when a new song is selected
+    setIsPlaying(true);
   };
 
   const togglePlay = () => {
@@ -36,7 +37,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <PlayerContext.Provider
-      value={{ currentSong, isPlaying, setCurrentSong, togglePlay }}
+      value={{ currentSong, isPlaying, setCurrentSong, togglePlay, playerRef }}
     >
       {children}
     </PlayerContext.Provider>

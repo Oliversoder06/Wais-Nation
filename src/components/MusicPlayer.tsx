@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
-import React, { useRef } from "react";
+import React from "react";
 import YouTube from "react-youtube";
 import { usePlayer } from "./PlayerContext";
+import VolumeControl from "./VolumeControl"; // Import VolumeControl
 
 const MusicPlayer: React.FC = () => {
-  const { currentSong, isPlaying, togglePlay } = usePlayer();
-  const playerRef = useRef<YT.Player | null>(null);
+  const { currentSong, isPlaying, togglePlay, playerRef } = usePlayer();
 
   const handlePlayerReady = (event: YT.PlayerEvent) => {
     playerRef.current = event.target;
@@ -90,13 +90,8 @@ const MusicPlayer: React.FC = () => {
           height={24}
           className="cursor-pointer hover:opacity-80 w-auto h-auto"
         />
-        <Image
-          src="/icons/volume.svg"
-          alt="volume"
-          width={24}
-          height={24}
-          className="cursor-pointer hover:opacity-80 w-auto h-auto"
-        />
+        {/* Replaced volume icon with VolumeControl */}
+        <VolumeControl />
       </div>
 
       {/* YouTube Player (hidden) */}
