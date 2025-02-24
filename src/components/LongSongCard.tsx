@@ -84,7 +84,7 @@ export default function LongSongCard({
           isCurrentSong
             ? "bg-green-800/20 border-l-4 border-green-400 md:hover:bg-green-800/30"
             : "bg-[#2c2a36] md:hover:bg-[#32303d]"
-        }  cursor-pointer w-full md:h-[92px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16
+        }  cursor-pointer w-full md:h-[80px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16
           `} // ✅ Background highlight
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
