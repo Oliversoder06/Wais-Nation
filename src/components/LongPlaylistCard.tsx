@@ -45,7 +45,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
         <div className="flex gap-4 items-center">
           {/* Playlist Image Placeholder */}
           <Image
-            src="/images/playlist.svg"
+            src="/images/Playlist.svg"
             alt="Playlist Image"
             width={104}
             height={104}

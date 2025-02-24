@@ -133,7 +133,7 @@ export default function PlaylistPage() {
         onClick={handleEdit}
       >
         <Image
-          src="/images/playlist.svg"
+          src="/images/Playlist.svg"
           alt="Playlist Image"
           width={200}
           height={200}
