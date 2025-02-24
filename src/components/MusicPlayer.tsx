@@ -1,12 +1,23 @@
 "use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import YouTube from "react-youtube";
-import { usePlayer } from "./PlayerContext";
-import VolumeControl from "./VolumeControl"; // Import VolumeControl
+import { useMusicStore } from "@/store/musicStore";
+import VolumeControl from "./VolumeControl";
 
 const MusicPlayer: React.FC = () => {
-  const { currentSong, isPlaying, togglePlay, playerRef } = usePlayer();
+  const {
+    currentTrack,
+    playPrevious,
+    playNext,
+    isPlaying,
+    togglePlay,
+    queue,
+    history,
+  } = useMusicStore();
+
+  const playerRef = useRef<YT.Player | null>(null);
 
   const handlePlayerReady = (event: YT.PlayerEvent) => {
     playerRef.current = event.target;
@@ -23,15 +34,21 @@ const MusicPlayer: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (playerRef.current && currentTrack) {
+      playerRef.current.loadVideoById(currentTrack.videoId);
+    }
+  }, [currentTrack]);
+
   return (
     <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
       {/* Left Side: Song Info */}
       <div className="flex gap-[20px] items-center">
-        {currentSong?.cover ? (
+        {currentTrack?.albumCover ? (
           <div className="w-[56px] h-[56px]">
             <Image
-              src={currentSong.cover}
-              alt={currentSong.title}
+              src={currentTrack.albumCover}
+              alt={currentTrack.title}
               width={56}
               height={56}
               className="rounded"
@@ -42,10 +59,10 @@ const MusicPlayer: React.FC = () => {
         )}
         <div className="flex flex-col justify-center">
           <span className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]">
-            {currentSong?.title || "No Song"}
+            {currentTrack?.title || "No Song"}
           </span>
           <span className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]">
-            {currentSong?.artist || "Unknown Artist"}
+            {currentTrack?.artist || "Unknown Artist"}
           </span>
         </div>
       </div>
@@ -53,13 +70,18 @@ const MusicPlayer: React.FC = () => {
       {/* Middle: Playback Controls */}
       <div className="flex flex-col w-[50%] gap-[20px] absolute left-1/2 transform -translate-x-1/2">
         <div className="flex gap-[28px] self-center">
+          {/* Previous Song Button */}
           <Image
             src="/icons/prevsong.svg"
             alt="prev song"
             width={24}
             height={24}
-            className="cursor-pointer hover:opacity-80 w-auto h-auto"
+            className={`cursor-pointer hover:opacity-80 w-auto h-auto ${
+              history.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={playPrevious}
           />
+          {/* Play/Pause Button */}
           <Image
             src={isPlaying ? "/icons/pause.svg" : "/icons/play.svg"}
             alt={isPlaying ? "pause song" : "play song"}
@@ -68,12 +90,16 @@ const MusicPlayer: React.FC = () => {
             onClick={handlePlayPause}
             className="cursor-pointer hover:opacity-80"
           />
+          {/* Next Song Button */}
           <Image
-            src="/icons/prevsong.svg"
+            src="/icons/nextsong.svg"
             alt="next song"
             width={24}
             height={24}
-            className="cursor-pointer hover:opacity-80 w-auto h-auto rotate-180"
+            className={`cursor-pointer hover:opacity-80 w-auto h-auto ${
+              queue.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={playNext}
           />
         </div>
         <div className="flex">
@@ -94,11 +120,11 @@ const MusicPlayer: React.FC = () => {
         <VolumeControl />
       </div>
 
-      {/* YouTube Player (hidden) */}
-      {currentSong && (
+      {/* YouTube Player (Hidden) */}
+      {currentTrack && (
         <div className="hidden">
           <YouTube
-            videoId={currentSong.videoId}
+            videoId={currentTrack.videoId}
             opts={{
               height: "0",
               width: "0",
@@ -110,6 +136,7 @@ const MusicPlayer: React.FC = () => {
               },
             }}
             onReady={handlePlayerReady}
+            onEnd={playNext} // Auto play next song when current one ends
           />
         </div>
       )}

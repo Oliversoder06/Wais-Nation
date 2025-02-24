@@ -1,4 +1,3 @@
-// src/components/LongSongCard.tsx
 "use client";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@clerk/nextjs";
@@ -6,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { searchYouTube } from "@/lib/youtube";
-import { usePlayer } from "./PlayerContext";
+import { useMusicStore } from "@/store/musicStore"; // ✅ Zustand
 import AddToPlaylistModal from "@/components/AddToPlaylistModal";
 
 interface LongSongCardProps {
@@ -40,8 +39,7 @@ export default function LongSongCard({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
   const { userId } = useAuth();
-
-  const { setCurrentSong } = usePlayer();
+  const { playTrack, currentTrack, isPlaying } = useMusicStore(); // ✅ Zustand store
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -59,59 +57,34 @@ export default function LongSongCard({
     fetchPlaylists();
   }, []);
 
-  const handleAddToPlaylist = async () => {
-    setShowModal(true);
-  };
-
-  const handleCheckboxChange = (playlistId: string) => {
-    setSelectedPlaylists((prev) =>
-      prev.includes(playlistId)
-        ? prev.filter((id) => id !== playlistId)
-        : [...prev, playlistId]
-    );
-  };
-
-  const handleAddTracksToPlaylists = async () => {
-    if (selectedPlaylists.length === 0) {
-      toast.error("Select at least one playlist.");
-      return;
-    }
-    const { error } = await supabase.from("playlist_tracks").insert(
-      selectedPlaylists.map((playlistId) => ({
-        playlist_id: playlistId,
-        title,
-        artist,
-        album,
-        duration,
-        cover,
-      }))
-    );
-    if (error) {
-      console.error("Error adding track to playlists:", error);
-      toast.error("Failed to add track.");
-    } else {
-      toast.success("Track added successfully!");
-      setShowModal(false);
-      setSelectedPlaylists([]);
-    }
-  };
-
   const handleCardClick = async () => {
     if (showModal) return;
     const query = `${title} ${artist}`;
     const ytId = await searchYouTube(query);
     if (ytId) {
-      setCurrentSong({ title, artist, album, cover, videoId: ytId });
-    } else {
+      playTrack({
+        id: ytId,
+        title,
+        artist,
+        albumCover: cover || "/default-cover.jpg",
+        videoId: ytId,
+      });
     }
   };
+
+  const isCurrentSong = currentTrack?.title === title; // ✅ Check if this song is playing
 
   return (
     <div className="w-full" onClick={handleCardClick}>
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="bg-[#2c2a36] md:hover:bg-[#32303d] cursor-pointer w-full md:h-[92px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16"
+        className={` ${
+          isCurrentSong
+            ? "bg-green-800/20 border-l-4 border-green-400 md:hover:bg-green-800/30"
+            : "bg-[#2c2a36] md:hover:bg-[#32303d]"
+        }  cursor-pointer w-full md:h-[92px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16
+          `} // ✅ Background highlight
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
           {cover ? (
@@ -132,34 +105,52 @@ export default function LongSongCard({
             />
           )}
           <div className="flex flex-col leading-[24px] overflow-hidden">
-            <span className="text-white font-semibold overflow-hidden text-ellipsis">
+            <span
+              className={`font-semibold overflow-hidden text-ellipsis
+                ${isCurrentSong ? "text-[#00FFB8]" : "text-white"}`} // ✅ Change text color
+            >
               {title}
             </span>
-            <span className="text-[#ABAAB8] text-[16px] overflow-hidden text-ellipsis">
+            <span
+              className={`text-[16px] overflow-hidden text-ellipsis
+                ${isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"}`} // ✅ Change artist color
+            >
               {artist}
             </span>
           </div>
         </div>
-        <span className="text-[#ABAABB] xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex">
+        <span
+          className={`${
+            isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
+          } xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex`}
+        >
           {album}
         </span>
-        <span className="text-[#ABAABB] xl:w-[20%] hidden xl:block">
+        <span
+          className={`${
+            isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
+          } xl:w-[20%] hidden xl:block`}
+        >
           {date}
         </span>
-        <div className="flex items-center gap-4 relative xl:w-[10%] justify-end">
-          <span
-            className={`text-[#ABAABB] pr-[16px] text-nowrap ${
-              isHovered && "opacity-0"
-            }`}
-          >
-            {duration}
-          </span>
+        <div className="flex items-center gap-4 relative xl:w-[10%] justify-end pr-[16px]">
+          {isCurrentSong && isPlaying ? (
+            <div className="equalizer w-[24px] h-[24px]">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          ) : (
+            <span className="text-[#ABAABB]  text-nowrap">{duration}</span>
+          )}
+
+          {/* ✅ Keep the "Create Plus" Menu on Hover */}
           {isHovered && (
             <div
               className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
               onClick={(e) => {
                 e.stopPropagation();
-                handleAddToPlaylist();
+                setShowModal(true);
               }}
             >
               <Image
@@ -167,6 +158,7 @@ export default function LongSongCard({
                 alt="Menu"
                 width={36}
                 height={36}
+                className="bg-[#32303d] rounded-full"
               />
             </div>
           )}
@@ -179,8 +171,37 @@ export default function LongSongCard({
           loading={loading}
           selectedPlaylists={selectedPlaylists}
           userId={userId ?? null}
-          handleCheckboxChange={handleCheckboxChange}
-          handleAddTracksToPlaylists={handleAddTracksToPlaylists}
+          handleCheckboxChange={(playlistId) =>
+            setSelectedPlaylists((prev) =>
+              prev.includes(playlistId)
+                ? prev.filter((id) => id !== playlistId)
+                : [...prev, playlistId]
+            )
+          }
+          handleAddTracksToPlaylists={async () => {
+            if (selectedPlaylists.length === 0) {
+              toast.error("Select at least one playlist.");
+              return;
+            }
+            const { error } = await supabase.from("playlist_tracks").insert(
+              selectedPlaylists.map((playlistId) => ({
+                playlist_id: playlistId,
+                title,
+                artist,
+                album,
+                duration,
+                cover,
+              }))
+            );
+            if (error) {
+              console.error("Error adding track to playlists:", error);
+              toast.error("Failed to add track.");
+            } else {
+              toast.success("Track added successfully!");
+              setShowModal(false);
+              setSelectedPlaylists([]);
+            }
+          }}
           closeModal={() => setShowModal(false)}
         />
       )}

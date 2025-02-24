@@ -13,7 +13,7 @@ const VolumeControl: React.FC = () => {
     if (playerRef.current) {
       playerRef.current.setVolume(volume);
     }
-  }, [volume]);
+  }, [volume, playerRef]);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value, 10);
