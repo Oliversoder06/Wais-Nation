@@ -7,6 +7,27 @@ import VolumeControl from "./VolumeControl";
 import Link from "next/link";
 import { searchSpotify } from "@/lib/spotify";
 
+// Define our own enum for player states
+enum YouTubePlayerState {
+  UNSTARTED = -1,
+  ENDED = 0,
+  PLAYING = 1,
+  PAUSED = 2,
+  BUFFERING = 3,
+  CUED = 5,
+}
+
+// Define our own interface for onStateChange events
+interface YouTubeOnStateChangeEvent {
+  data: number;
+}
+
+// Extend the YT.Player interface to include getCurrentTime and seekTo
+interface ExtendedYTPlayer extends YT.Player {
+  getCurrentTime(): number;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
+}
+
 const MusicPlayer: React.FC = () => {
   const {
     currentTrack,
@@ -23,7 +44,10 @@ const MusicPlayer: React.FC = () => {
   const [volume, setVolume] = useState(50);
   const [spotifyTrackId, setSpotifyTrackId] = useState<string | null>(null);
   const [artistId, setArtistId] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // When a new track loads, load its YouTube video
   useEffect(() => {
     if (playerRef.current && currentTrack) {
       playerRef.current.loadVideoById(currentTrack.videoId);
@@ -44,10 +68,8 @@ const MusicPlayer: React.FC = () => {
             searchResults.tracks.items &&
             searchResults.tracks.items.length > 0
           ) {
-            // Use the first result's Spotify track ID
             const spotifyTrack = searchResults.tracks.items[0];
             setSpotifyTrackId(spotifyTrack.id);
-            // Also store the first artist's ID, if available
             if (spotifyTrack.artists && spotifyTrack.artists.length > 0) {
               setArtistId(spotifyTrack.artists[0].id);
             } else {
@@ -77,6 +99,45 @@ const MusicPlayer: React.FC = () => {
       togglePlay();
     }
   };
+
+  // Reset currentTime when a new track loads
+  useEffect(() => {
+    setCurrentTime(0);
+  }, [currentTrack]);
+
+  // Poll the player's current time using onStateChange
+  const onPlayerStateChange = (event: YouTubeOnStateChangeEvent) => {
+    if (event.data === YouTubePlayerState.PLAYING) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(() => {
+        if (playerRef.current) {
+          const time = Math.floor(
+            (playerRef.current as ExtendedYTPlayer).getCurrentTime()
+          );
+          setCurrentTime(time);
+        }
+      }, 500);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  };
+
+  // Clean up the interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  // Helper to format seconds into mm:ss format
+  function formatDuration(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  }
 
   return (
     <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
@@ -124,7 +185,7 @@ const MusicPlayer: React.FC = () => {
       </div>
 
       {/* Middle: Playback Controls */}
-      <div className="flex flex-col w-[50%] gap-[20px] absolute left-1/2 transform -translate-x-1/2">
+      <div className="flex flex-col w-[50%] gap-[4px] absolute left-1/2 transform -translate-x-1/2">
         <div className="flex gap-[28px] self-center">
           <Image
             src="/icons/prevsong.svg"
@@ -159,8 +220,34 @@ const MusicPlayer: React.FC = () => {
             onClick={playNext}
           />
         </div>
-        <div className="flex">
-          <div className="bg-[#2A2A2A] h-[4px] w-full rounded-full"></div>
+        <div className="flex items-center gap-4">
+          <p className="text-sm text-gray-400">{formatDuration(currentTime)}</p>
+          <div
+            className="relative w-full h-[4px] bg-[#2A2A2A] rounded-full cursor-pointer"
+            onClick={(e) => {
+              if (!playerRef.current || !currentTrack) return;
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickX = e.clientX - rect.left;
+              const percentage = clickX / rect.width;
+              const newTime = percentage * currentTrack.duration;
+              (playerRef.current as ExtendedYTPlayer).seekTo(newTime, true);
+              setCurrentTime(newTime);
+            }}
+          >
+            <div
+              className="absolute h-full bg-[#00FF99] rounded-full"
+              style={{
+                width: `${
+                  currentTrack && currentTrack.duration
+                    ? (currentTime / currentTrack.duration) * 100
+                    : 0
+                }%`,
+              }}
+            ></div>
+          </div>
+          <p className="text-sm text-gray-400">
+            {formatDuration(currentTrack?.duration || 0)}
+          </p>
         </div>
       </div>
 
@@ -173,7 +260,6 @@ const MusicPlayer: React.FC = () => {
           height={24}
           className="cursor-pointer hover:opacity-80 w-auto h-auto"
         />
-        {/* Pass the volume state and setter to VolumeControl */}
         <VolumeControl
           volume={volume}
           setVolume={setVolume}
@@ -198,9 +284,9 @@ const MusicPlayer: React.FC = () => {
             }}
             onReady={(event) => {
               playerRef.current = event.target;
-              // Use the current volume from state instead of hard-coded 50
               event.target.setVolume(volume);
             }}
+            onStateChange={onPlayerStateChange}
             onEnd={playNext}
           />
         </div>

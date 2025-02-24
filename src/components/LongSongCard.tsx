@@ -60,15 +60,17 @@ export default function LongSongCard({
   const handleCardClick = async () => {
     if (showModal) return;
     const query = `${title} ${artist}`;
-    const ytId = await searchYouTube(query);
-    if (ytId) {
+    const result = await searchYouTube(query);
+
+    if (result) {
       playTrack({
-        id: ytId,
+        id: result.videoId,
         title,
         artist,
         albumCover: cover || "/default-cover.jpg",
-        videoId: ytId,
+        videoId: result.videoId,
         spotifyTrackId: "",
+        duration: result.duration, // Store YouTube duration
       });
     }
   };

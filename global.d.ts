@@ -1,6 +1,12 @@
 declare global {
   namespace YT {
     class Player {
+      seekTo(newTime: number, arg1: boolean) {
+        throw new Error("Method not implemented.");
+      }
+      getCurrentTime(): number {
+        throw new Error("Method not implemented.");
+      }
       loadVideoById(videoId: string) {
         throw new Error("Method not implemented.");
       }

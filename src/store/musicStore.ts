@@ -6,7 +6,8 @@ type Track = {
   title: string;
   artist: string;
   albumCover: string;
-  videoId: string; // YouTube Video ID
+  videoId: string;
+  duration: number; // Add YouTube duration
 };
 
 type PlayerState = {
