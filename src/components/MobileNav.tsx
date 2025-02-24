@@ -8,7 +8,7 @@ const MobileNav = () => {
   const pathname = usePathname();
 
   return (
-    <div className="bg-[#1D1C24] h-[80px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">
+    <div className="bg-[#1D1C24] h-[100px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">
       <Link href="/" className="flex flex-col gap-[8px] items-center">
         <Image
           src={
