@@ -56,7 +56,7 @@ const Playlists: React.FC = () => {
     );
 
     if (newPlaylist) {
-      setPlaylists((prev) => [...prev, ...newPlaylist]);
+      setPlaylists((prev) => [...newPlaylist, ...prev]);
       setShowModal(false);
       setPlaylistName("");
       setPlaylistDescription("");
