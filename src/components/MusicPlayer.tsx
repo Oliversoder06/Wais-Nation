@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";
 import YouTube from "react-youtube";
@@ -17,6 +16,7 @@ const MusicPlayer: React.FC = () => {
     history,
   } = useMusicStore();
 
+  // Create a local playerRef that will be passed to VolumeControl
   const playerRef = useRef<YT.Player | null>(null);
 
   const handlePlayerReady = (event: YT.PlayerEvent) => {
@@ -76,7 +76,7 @@ const MusicPlayer: React.FC = () => {
             alt="prev song"
             width={24}
             height={24}
-            className={` w-auto h-auto ${
+            className={`w-auto h-auto ${
               history.length > 0
                 ? "opacity-100 hover:opacity-80 cursor-pointer"
                 : "opacity-50 hover:opacity-40"
@@ -120,8 +120,8 @@ const MusicPlayer: React.FC = () => {
           height={24}
           className="cursor-pointer hover:opacity-80 w-auto h-auto"
         />
-        {/* Replaced volume icon with VolumeControl */}
-        <VolumeControl />
+        {/* Pass playerRef as a prop to VolumeControl */}
+        <VolumeControl playerRef={playerRef} />
       </div>
 
       {/* YouTube Player (Hidden) */}
@@ -140,7 +140,7 @@ const MusicPlayer: React.FC = () => {
               },
             }}
             onReady={handlePlayerReady}
-            onEnd={playNext} // Auto play next song when current one ends
+            onEnd={playNext}
           />
         </div>
       )}

@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { usePlayer } from "./PlayerContext";
 
-const VolumeControl: React.FC = () => {
-  const { playerRef } = usePlayer();
+interface VolumeControlProps {
+  playerRef: React.MutableRefObject<YT.Player | null>;
+}
+
+const VolumeControl: React.FC<VolumeControlProps> = ({ playerRef }) => {
   const [volume, setVolume] = useState(50);
   const [lastVolume, setLastVolume] = useState(50);
   const showSlider = true;
