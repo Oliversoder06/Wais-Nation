@@ -45,7 +45,6 @@ const Page: React.FC = () => {
             setShowResults(true);
           } catch (error) {
             toast.error("Error during Spotify search:");
-            console.log("Error during Spotify search: ", error);
           }
         })();
       }, 100);

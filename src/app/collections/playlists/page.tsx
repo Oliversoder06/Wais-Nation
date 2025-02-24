@@ -34,7 +34,6 @@ const Playlists: React.FC = () => {
 
       if (error) {
         toast.error("Error fetching playlists:");
-        console.log("Error fetching playlists: ", error);
       } else {
         setPlaylists(data || []);
       }

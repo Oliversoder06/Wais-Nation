@@ -84,7 +84,6 @@ export async function searchSpotify({
 }): Promise<SpotifySearchResponse | null> {
   try {
     const token = await getSpotifyToken();
-    console.log("Searching Spotify for:", query);
     const response = await fetch(
       `https://api.spotify.com/v1/search?offset=0&limit=${limit}&q=${encodeURIComponent(
         query
@@ -97,13 +96,11 @@ export async function searchSpotify({
       }
     );
 
-    console.log("Response status:", response.status);
     if (!response.ok) {
       throw new Error(`Failed to search Spotify: ${response.statusText}`);
     }
 
     const data: SpotifySearchResponse = await response.json();
-    console.log("Search results:", data);
     return data;
   } catch (error) {
     console.error("Error searching Spotify:", error);

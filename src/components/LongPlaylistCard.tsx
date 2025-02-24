@@ -29,7 +29,6 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
   const handleDelete = async () => {
     if (!id) {
       toast.error("Playlist ID is missing, try refreshing the page");
-      console.log("Playlist ID is missing");
       return;
     }
 

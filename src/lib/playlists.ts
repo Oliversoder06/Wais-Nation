@@ -22,7 +22,6 @@ export const addTrackToPlaylist = async (
   }
 
   toast.success("Added track to playlist");
-  console.log("Added track to playlist: ", data);
   return data;
 };
 
@@ -34,7 +33,6 @@ export const createPlaylist = async (
 ) => {
   if (!userId || !name || !name.trim()) {
     toast.error("User not logged in or invalid input");
-    console.log(name, description, userId);
     return null;
   }
 
@@ -75,7 +73,6 @@ export const deletePlaylist = async (playlistId: string) => {
     return false;
   }
 
-  console.log("Playlist deleted successfully");
   return true;
 };
 
@@ -101,7 +98,6 @@ export const updatePlaylist = async (
     return false;
   }
 
-  console.log("Playlist updated successfully");
   // Return the first (and likely only) updated record
   return data && data.length ? data[0] : false;
 };

@@ -11,7 +11,6 @@ export const searchYouTube = async (query: string) => {
     }
 
     const data = await response.json();
-    console.log("YouTube Music API response:", data);
 
     return data.videoId || null;
   } catch (error) {

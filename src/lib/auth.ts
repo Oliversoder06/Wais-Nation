@@ -9,7 +9,6 @@ export const signInWithGoogle = async () => {
 
   if (error) {
     toast.error("Google Sign-In Error:");
-    console.log("Google Sign-In Error:", error);
   }
 
   return data;
@@ -20,6 +19,5 @@ export const signOut = async () => {
   const { error } = await supabase.auth.signOut();
   if (error) {
     toast.error("Sign-out error:");
-    console.log("Sign-out error:", error);
   }
 };

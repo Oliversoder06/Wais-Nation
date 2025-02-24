@@ -51,7 +51,6 @@ export default function LongSongCard({
         .select("id, name, description, user_id");
       if (error) {
         toast.error("Error fetching playlists:");
-        console.log("Error fetching playlists: ", error);
       } else {
         setPlaylists(data || []);
       }
@@ -104,7 +103,6 @@ export default function LongSongCard({
     if (ytId) {
       setCurrentSong({ title, artist, album, cover, videoId: ytId });
     } else {
-      console.log("No video id available for playback");
     }
   };
 
