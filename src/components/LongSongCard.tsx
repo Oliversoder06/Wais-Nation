@@ -68,6 +68,7 @@ export default function LongSongCard({
         artist,
         albumCover: cover || "/default-cover.jpg",
         videoId: ytId,
+        spotifyTrackId: "",
       });
     }
   };

@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import YouTube from "react-youtube";
 import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
+import Link from "next/link";
+import { searchSpotify } from "@/lib/spotify"; // Import function
 
 const MusicPlayer: React.FC = () => {
   const {
@@ -16,12 +18,43 @@ const MusicPlayer: React.FC = () => {
     history,
   } = useMusicStore();
 
-  // Create a local playerRef that will be passed to VolumeControl
   const playerRef = useRef<YT.Player | null>(null);
+  const [spotifyTrackId, setSpotifyTrackId] = useState<string | null>(null);
 
-  const handlePlayerReady = (event: YT.PlayerEvent) => {
-    playerRef.current = event.target;
-  };
+  useEffect(() => {
+    if (playerRef.current && currentTrack) {
+      playerRef.current.loadVideoById(currentTrack.videoId);
+    }
+  }, [currentTrack]);
+
+  // Fetch the correct Spotify ID when a new track plays
+  useEffect(() => {
+    async function fetchSpotifyId() {
+      if (currentTrack) {
+        try {
+          // Create a search query based on track title and artist
+          const query = `${currentTrack.title} ${currentTrack.artist}`;
+          // Search Spotify for the track
+          const searchResults = await searchSpotify({ query, limit: 1 });
+          if (
+            searchResults &&
+            searchResults.tracks.items &&
+            searchResults.tracks.items.length > 0
+          ) {
+            // Use the first result's Spotify ID
+            const spotifyTrack = searchResults.tracks.items[0];
+            setSpotifyTrackId(spotifyTrack.id);
+          } else {
+            setSpotifyTrackId(null);
+          }
+        } catch (error) {
+          console.error("Error fetching Spotify track ID:", error);
+          setSpotifyTrackId(null);
+        }
+      }
+    }
+    fetchSpotifyId();
+  }, [currentTrack]);
 
   const handlePlayPause = () => {
     if (playerRef.current) {
@@ -33,12 +66,6 @@ const MusicPlayer: React.FC = () => {
       togglePlay();
     }
   };
-
-  useEffect(() => {
-    if (playerRef.current && currentTrack) {
-      playerRef.current.loadVideoById(currentTrack.videoId);
-    }
-  }, [currentTrack]);
 
   return (
     <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
@@ -58,10 +85,19 @@ const MusicPlayer: React.FC = () => {
           <div className="w-[56px] h-[56px] bg-red-500" />
         )}
         <div className="flex flex-col justify-center">
-          <span className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]">
-            {currentTrack?.title || "No Song"}
-          </span>
-          <span className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]">
+          {currentTrack ? (
+            <Link
+              href={`/track/${spotifyTrackId || "unknown"}`} // Use Spotify ID or fallback
+              className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]"
+            >
+              {currentTrack.title || "No Song"}
+            </Link>
+          ) : (
+            <span className="text-white font-semibold text-[20px] truncate max-w-[200px]">
+              No Song
+            </span>
+          )}
+          <span className="text-[#ABAAB8] font-semibold hover:underline cursor-not-allowed truncate max-w-[200px]">
             {currentTrack?.artist || "Unknown Artist"}
           </span>
         </div>
@@ -107,7 +143,7 @@ const MusicPlayer: React.FC = () => {
           />
         </div>
         <div className="flex">
-          <div className="bg-[#2A2A2A] h-[4px] w-full rounded-full"></div>
+          <div className="bg-[#2A2A2A] h-[4px] w-full rounded-full cursor-not-allowed"></div>
         </div>
       </div>
 
@@ -118,7 +154,7 @@ const MusicPlayer: React.FC = () => {
           alt="loop song"
           width={24}
           height={24}
-          className="cursor-pointer hover:opacity-80 w-auto h-auto"
+          className="cursor-not-allowed hover:opacity-80 w-auto h-auto"
         />
         {/* Pass playerRef as a prop to VolumeControl */}
         <VolumeControl playerRef={playerRef} />
@@ -139,7 +175,9 @@ const MusicPlayer: React.FC = () => {
                 showinfo: 0,
               },
             }}
-            onReady={handlePlayerReady}
+            onReady={(event) => {
+              playerRef.current = event.target;
+            }}
             onEnd={playNext}
           />
         </div>
