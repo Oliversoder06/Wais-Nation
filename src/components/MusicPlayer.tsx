@@ -5,7 +5,6 @@ import YouTube from "react-youtube";
 import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 import Link from "next/link";
-import { getTrackDetails } from "@/lib/spotify";
 
 const MusicPlayer: React.FC = () => {
   const {
