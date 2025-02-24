@@ -11,8 +11,8 @@ import { PlayerProvider } from "@/components/PlayerContext";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
-  title: "My PWA App",
-  description: "A Next.js 15 Progressive Web App",
+  title: "Wais Nation",
+  description: "A better Spotify",
 };
 
 export default function RootLayout({
@@ -40,17 +40,17 @@ export default function RootLayout({
             <link
               rel="apple-touch-icon"
               sizes="180x180"
-              href="/images/icon-180x180.png"
+              href="/images/logo180.png"
             />
             <link
               rel="apple-touch-icon"
               sizes="152x152"
-              href="/images/icon-152x152.png"
+              href="/images/logo152.png"
             />
             <link
               rel="apple-touch-icon"
               sizes="167x167"
-              href="/images/icon-167x167.png"
+              href="/images/logo167.png"
             />
           </head>
           <body className="bg-[#1D1C24] md:bg-background flex flex-col md:flex-row">
