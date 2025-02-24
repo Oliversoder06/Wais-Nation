@@ -7,8 +7,15 @@ import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 
 const MusicPlayer: React.FC = () => {
-  const { currentTrack, playPrevious, playNext, isPlaying, togglePlay, queue } =
-    useMusicStore();
+  const {
+    currentTrack,
+    playPrevious,
+    playNext,
+    isPlaying,
+    togglePlay,
+    queue,
+    history,
+  } = useMusicStore();
 
   const playerRef = useRef<YT.Player | null>(null);
 
@@ -70,7 +77,7 @@ const MusicPlayer: React.FC = () => {
             width={24}
             height={24}
             className={` w-auto h-auto ${
-              queue.length === 0
+              history.length > 0
                 ? "opacity-100 hover:opacity-80 cursor-pointer"
                 : "opacity-50 hover:opacity-40"
             }`}
