@@ -1,11 +1,13 @@
+// src/components/LongSongCard.tsx
+
 "use client";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { searchYouTube } from "@/lib/youtube";
-import { useMusicStore } from "@/store/musicStore"; // ✅ Zustand
+import { searchYouTube, parseDuration } from "@/lib/youtube";
+import { useMusicStore } from "@/store/musicStore";
 import AddToPlaylistModal from "@/components/AddToPlaylistModal";
 
 interface LongSongCardProps {
@@ -13,7 +15,7 @@ interface LongSongCardProps {
   artist: string;
   album: string;
   date: string;
-  duration: string;
+  duration: string; // e.g., "3:22" for display purposes
   cover?: string;
 }
 
@@ -39,7 +41,7 @@ export default function LongSongCard({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedPlaylists, setSelectedPlaylists] = useState<string[]>([]);
   const { userId } = useAuth();
-  const { playTrack, currentTrack, isPlaying } = useMusicStore(); // ✅ Zustand store
+  const { playTrack, currentTrack, isPlaying } = useMusicStore();
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -62,32 +64,35 @@ export default function LongSongCard({
     const query = `${title} ${artist}`;
     const result = await searchYouTube(query);
 
-    if (result) {
-      playTrack({
-        id: result.videoId,
-        title,
-        artist,
-        albumCover: cover || "/default-cover.jpg",
-        videoId: result.videoId,
-        spotifyTrackId: "",
-        duration: result.duration, // Store YouTube duration
-      });
+    if (!result || !result.videoId) {
+      console.error("❌ No video found for:", query);
+      return;
     }
+
+    console.log("✅ Playing:", result);
+    playTrack({
+      id: result.videoId,
+      title: result.title,
+      artist: result.artist,
+      albumCover: result.thumbnail || cover || "/default-cover.jpg",
+      videoId: result.videoId,
+      spotifyTrackId: "",
+      duration: parseDuration(result.duration), // Convert "3:22" to seconds
+    });
   };
 
-  const isCurrentSong = currentTrack?.title === title; // ✅ Check if this song is playing
+  const isCurrentSong = currentTrack?.title === title;
 
   return (
     <div className="w-full" onClick={handleCardClick}>
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={` ${
+        className={`${
           isCurrentSong
             ? "bg-green-800/20 border-l-4 border-green-400 md:hover:bg-green-800/30"
             : "bg-container md:hover:bg-hover_container"
-        }  cursor-pointer w-full md:h-[80px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16
-          `} // ✅ Background highlight
+        } cursor-pointer w-full md:h-[80px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16`}
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
           {cover ? (
@@ -109,14 +114,16 @@ export default function LongSongCard({
           )}
           <div className="flex flex-col leading-[24px] overflow-hidden">
             <span
-              className={`font-semibold overflow-hidden text-ellipsis
-                ${isCurrentSong ? "text-[#00FFB8]" : "text-white"}`} // ✅ Change text color
+              className={`font-semibold overflow-hidden text-ellipsis ${
+                isCurrentSong ? "text-[#00FFB8]" : "text-white"
+              }`}
             >
               {title}
             </span>
             <span
-              className={`text-[16px] overflow-hidden text-ellipsis
-                ${isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"}`} // ✅ Change artist color
+              className={`text-[16px] overflow-hidden text-ellipsis ${
+                isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
+              }`}
             >
               {artist}
             </span>
@@ -147,13 +154,11 @@ export default function LongSongCard({
             <span
               className={`${
                 isCurrentSong ? "text-[#22aa84]" : "text-white"
-              }  text-nowrap`}
+              } text-nowrap`}
             >
               {duration}
             </span>
           )}
-
-          {/* ✅ Keep the "Create Plus" Menu on Hover */}
           {isHovered && (
             <div
               className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"

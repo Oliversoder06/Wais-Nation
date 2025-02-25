@@ -79,6 +79,7 @@ const Sideplayer = () => {
         backgroundImage: `url(${albumCover})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        // filter: "blur(8px)",
       }
     : {};
 
@@ -148,7 +149,7 @@ const Sideplayer = () => {
         style={containerStyle}
       >
         {/* Dark overlay to darken only the background image */}
-        <div className="absolute inset-0 bg-secondary opacity-50"></div>
+        <div className="absolute inset-0 bg-secondary opacity-[0.85]"></div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">

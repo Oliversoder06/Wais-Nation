@@ -44,7 +44,8 @@ const MusicPlayer: React.FC = () => {
 
   useEffect(() => {
     if (playerRef.current && currentTrack) {
-      playerRef.current.loadVideoById(currentTrack.videoId);
+      console.log("Loading video:", currentTrack.videoId); // ✅ Debug log
+      playerRef.current.loadVideoById(currentTrack.videoId); // ✅ Ensure this loads the correct video
     }
   }, [currentTrack]);
 
@@ -260,20 +261,16 @@ const MusicPlayer: React.FC = () => {
       {currentTrack && (
         <div className="hidden">
           <YouTube
-            videoId={currentTrack.videoId}
+            videoId={currentTrack?.videoId}
             opts={{
               height: "0",
               width: "0",
-              playerVars: {
-                autoplay: 1,
-                controls: 0,
-                rel: 0,
-                showinfo: 0,
-              },
+              playerVars: { autoplay: 1, controls: 0, rel: 0, showinfo: 0 },
             }}
             onReady={(event) => {
               playerRef.current = event.target;
-              event.target.setVolume(volume);
+              console.log("YouTube Player Ready!"); // ✅ Debug log
+              event.target.playVideo(); // ✅ Auto-play when ready
             }}
             onStateChange={onPlayerStateChange}
             onEnd={playNext}

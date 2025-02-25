@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["i.scdn.co"],
+    domains: ["i.scdn.co", "lh3.googleusercontent.com"],
   },
 };
 

@@ -1,51 +1,60 @@
-export async function searchYouTube(
-  query: string
-): Promise<{ videoId: string; duration: number } | null> {
-  function parseISO8601Duration(duration: string): number {
-    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    if (!match) return 0;
+// src/lib/youtube.ts
 
-    const hours = match[1] ? parseInt(match[1]) || 0 : 0;
-    const minutes = match[2] ? parseInt(match[2]) || 0 : 0;
-    const seconds = match[3] ? parseInt(match[3]) || 0 : 0;
-
-    return hours * 3600 + minutes * 60 + seconds;
+/**
+ * Parses a duration string in "MM:SS" or "HH:MM:SS" format to seconds.
+ */
+export function parseDuration(duration: string): number {
+  const parts = duration.split(":").map(Number);
+  if (parts.length === 2) {
+    return parts[0] * 60 + parts[1];
+  } else if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
+  return 0;
+}
 
+/**
+ * Searches YouTube using your backend endpoint.
+ * Expects your backend to return JSON with these fields:
+ * {
+ *   "videoId": string,
+ *   "duration": string,  // e.g. "3:22"
+ *   "artist": string,
+ *   "thumbnail": string,
+ *   "title": string
+ * }
+ */
+export async function searchYouTube(query: string): Promise<{
+  videoId: string;
+  duration: string;
+  artist: string;
+  thumbnail: string;
+  title: string;
+} | null> {
   try {
-    const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL2; // e.g., "https://waisnation-backend.onrender.com"
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(
-        query
-      )}&key=${API_KEY}&maxResults=1`
+      `${API_URL}/search?query=${encodeURIComponent(query)}`
     );
-    const data = await response.json();
-
-    if (!data.items || data.items.length === 0) {
-      return null;
-    }
-
-    const videoId = data.items[0].id.videoId;
-
-    // Fetch video details to get duration
-    const videoDetailsResponse = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${API_KEY}`
-    );
-    if (!videoDetailsResponse.ok) {
-      console.log(
-        "Error fetching video details:" + videoDetailsResponse.statusText
+    if (!response.ok) {
+      console.error(
+        "Error fetching YouTube search results:" + response.statusText
       );
-    }
-    const videoDetails = await videoDetailsResponse.json();
-
-    if (!videoDetails.items || videoDetails.items.length === 0) {
       return null;
     }
-
-    const isoDuration = videoDetails.items[0].contentDetails.duration;
-    const durationSeconds = parseISO8601Duration(isoDuration);
-
-    return { videoId, duration: durationSeconds };
+    const data = await response.json();
+    console.log("Backend search data:", data);
+    // We assume the backend returns the correct fields.
+    if (!data.videoId) {
+      return null;
+    }
+    return {
+      videoId: data.videoId,
+      duration: data.duration, // "3:22"
+      artist: data.artist,
+      thumbnail: data.thumbnail,
+      title: data.title,
+    };
   } catch (error) {
     console.error("Error searching YouTube:", error);
     return null;

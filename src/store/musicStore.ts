@@ -15,12 +15,16 @@ type PlayerState = {
   queue: Track[];
   history: Track[];
   isPlaying: boolean;
+  playbackPosition: number; // NEW: current time in seconds
+  volume: number; // NEW: volume level
 
   playTrack: (track: Track) => void;
   playNext: () => void;
   playPrevious: () => void;
   addToQueue: (track: Track) => void;
   togglePlay: () => void;
+  setPlaybackPosition: (position: number) => void; // NEW
+  setVolume: (vol: number) => void; // NEW
 };
 
 export const useMusicStore = create<PlayerState>((set) => ({
@@ -28,15 +32,17 @@ export const useMusicStore = create<PlayerState>((set) => ({
   queue: [],
   history: [],
   isPlaying: false,
+  playbackPosition: 0, // default starting at 0 seconds
+  volume: 50, // default volume level
 
   playTrack: (track) =>
     set((state) => ({
       history: state.currentTrack
         ? [state.currentTrack, ...state.history]
         : state.history,
-      currentTrack: track,
-      queue: state.queue.filter((t) => t.id !== track.id), // Remove from queue if present
-      isPlaying: true,
+      currentTrack: track, // ✅ This should now have all correct details
+      queue: state.queue.filter((t) => t.id !== track.id),
+      isPlaying: true, // ✅ Ensure it's marked as playing
     })),
 
   playNext: () =>
@@ -50,6 +56,7 @@ export const useMusicStore = create<PlayerState>((set) => ({
         currentTrack: nextTrack,
         queue: state.queue.slice(1),
         isPlaying: true,
+        playbackPosition: 0,
       };
     }),
 
@@ -62,6 +69,7 @@ export const useMusicStore = create<PlayerState>((set) => ({
         history: state.history.slice(1),
         queue: [state.currentTrack!, ...state.queue],
         isPlaying: true,
+        playbackPosition: 0,
       };
     }),
 
@@ -71,4 +79,10 @@ export const useMusicStore = create<PlayerState>((set) => ({
     })),
 
   togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
+
+  // NEW: Set the current playback position (in seconds)
+  setPlaybackPosition: (position) => set({ playbackPosition: position }),
+
+  // NEW: Set the volume level
+  setVolume: (vol) => set({ volume: vol }),
 }));
