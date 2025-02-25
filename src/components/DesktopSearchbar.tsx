@@ -115,7 +115,9 @@ const DesktopSearchbar: React.FC = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside, {
+      passive: true,
+    });
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -126,7 +128,7 @@ const DesktopSearchbar: React.FC = () => {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search Spotify tracks and artists..."
+          placeholder="Search for tracks and artists..."
           className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
           onFocus={() => setShowResults(true)}
         />

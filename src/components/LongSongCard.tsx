@@ -60,6 +60,7 @@ export default function LongSongCard({
   }, []);
 
   const handleCardClick = async () => {
+    setLoading(true);
     if (showModal) return;
     const query = `${title} ${artist}`;
     const result = await searchYouTube(query);
@@ -79,6 +80,7 @@ export default function LongSongCard({
       spotifyTrackId: "",
       duration: parseDuration(result.duration), // Convert "3:22" to seconds
     });
+    setLoading(false);
   };
 
   const isCurrentSong = currentTrack?.title === title;
