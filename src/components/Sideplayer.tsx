@@ -12,7 +12,6 @@ const Sideplayer = () => {
   const { currentTrack } = useMusicStore();
   const [isLiked, setIsLiked] = useState(false);
   const [open, setOpen] = useState(false);
-  // Removed unused spotifyTrackId state
   const [artistId, setArtistId] = useState<string | null>(null);
   const [artistDetails, setArtistDetails] =
     useState<SpotifyArtistDetails | null>(null);
@@ -149,7 +148,7 @@ const Sideplayer = () => {
         style={containerStyle}
       >
         {/* Dark overlay to darken only the background image */}
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-[#1D1C24] opacity-50"></div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">

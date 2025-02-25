@@ -154,7 +154,7 @@ const MusicPlayer: React.FC = () => {
             />
           </div>
         ) : (
-          <div className="w-[56px] h-[56px] bg-red-500" />
+          <div className="w-[56px] h-[56px] bg-[#3a3847]" />
         )}
         <div className="flex flex-col justify-center">
           {currentTrack ? (
