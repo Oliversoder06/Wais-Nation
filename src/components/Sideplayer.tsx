@@ -148,7 +148,7 @@ const Sideplayer = () => {
         style={containerStyle}
       >
         {/* Dark overlay to darken only the background image */}
-        <div className="absolute inset-0 bg-[#1D1C24] opacity-50"></div>
+        <div className="absolute inset-0 bg-secondary opacity-50"></div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
@@ -177,7 +177,7 @@ const Sideplayer = () => {
               className="w-full h-[300px] object-cover rounded-lg"
             />
           ) : (
-            <div className="h-[300px] w-full bg-[#3a3847] rounded-lg"></div>
+            <div className="h-[300px] w-full bg-container rounded-lg"></div>
           )}
         </div>
       </div>

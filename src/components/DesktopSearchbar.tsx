@@ -127,7 +127,7 @@ const DesktopSearchbar: React.FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search Spotify tracks and artists..."
-          className="w-[452px] h-[48px] bg-[#2F2E36] rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
+          className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
           onFocus={() => setShowResults(true)}
         />
         <Image
@@ -139,10 +139,10 @@ const DesktopSearchbar: React.FC = () => {
         />
         {showResults &&
           (artistResults.length > 0 || trackResults.length > 0) && (
-            <div className="absolute top-full left-0 right-0 bg-[#151418] shadow-lg rounded mt-2 max-h-96 overflow-y-auto scrollbar z-[1000]">
+            <div className="absolute top-full left-0 right-0 bg-background shadow-lg rounded mt-2 max-h-96 overflow-y-auto scrollbar z-[1000]">
               {/* Top 2 Artists Section */}
               {artistResults.length > 0 && (
-                <div className="border-b border-gray-700 pb-2">
+                <div className="border-b border-container pb-2">
                   {artistResults.map((artist) => (
                     <Link
                       href={`/artist/${artist.id}`}
@@ -150,7 +150,7 @@ const DesktopSearchbar: React.FC = () => {
                       passHref
                     >
                       <div
-                        className="p-2 hover:bg-[#2a2830] cursor-pointer flex items-center gap-2"
+                        className="p-2 hover:bg-container cursor-pointer flex items-center gap-2"
                         onClick={() => {
                           setQuery("");
                           setShowResults(false);
@@ -181,7 +181,7 @@ const DesktopSearchbar: React.FC = () => {
                   {trackResults.map((track) => (
                     <Link href={`/track/${track.id}`} key={track.id} passHref>
                       <div
-                        className="p-2 hover:bg-[#2a2830] cursor-pointer flex items-center gap-2"
+                        className="p-2 hover:bg-container cursor-pointer flex items-center gap-2"
                         onClick={() => {
                           setQuery("");
                           setShowResults(false);

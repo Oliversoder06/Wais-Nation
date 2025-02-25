@@ -71,7 +71,7 @@ const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
                   />
                   <label
                     htmlFor={playlist.id}
-                    className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-[#00FF99] peer-checked:border-[#00FF99] transition"
+                    className="size-6 border-2 border-[#ABAABB] rounded-full flex items-center justify-center cursor-pointer peer-checked:bg-primary peer-checked:border-primary transition"
                   >
                     <svg
                       className="hidden"
@@ -95,7 +95,7 @@ const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
         </div>
         <button
           onClick={handleAddTracksToPlaylists}
-          className="bg-[#00FF99] text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]"
+          className="bg-primary text-black p-2 rounded-md font-semibold w-full hover:bg-[#00e88f]"
         >
           Add to Playlist
         </button>

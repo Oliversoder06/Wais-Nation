@@ -53,7 +53,7 @@ export default function RootLayout({
               href="/images/logo167.png"
             />
           </head>
-          <body className="bg-[#1D1C24] md:bg-background flex flex-col md:flex-row">
+          <body className="bg-secondary md:bg-background flex flex-col md:flex-row">
             <ServiceWorkerRegister />
 
             {/* Mobile Header/Navigation */}
@@ -70,7 +70,7 @@ export default function RootLayout({
 
             {/* Main Content Area */}
             <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] h-[calc(100vh-25px)] md:pt-[64px] md:px-[8px] pb-[75px]">
-              <div className="md:bg-[#1D1C24] rounded-lg h-full w-full md:overflow-y-auto scrollbar">
+              <div className="md:bg-secondary rounded-lg h-full w-full md:overflow-y-auto scrollbar">
                 {children}
               </div>
             </main>

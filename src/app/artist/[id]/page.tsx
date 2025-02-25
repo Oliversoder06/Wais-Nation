@@ -35,7 +35,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const monthlyListeners = artist.followers.total.toLocaleString();
 
   return (
-    <div className="flex flex-col text-white bg-[#121212] min-h-screen">
+    <div className="flex flex-col text-white bg-secondary min-h-screen">
       {/* Hero / Banner Section */}
       <div
         className="relative w-full h-80 bg-cover bg-center flex items-end p-8"

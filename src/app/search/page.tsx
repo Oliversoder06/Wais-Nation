@@ -83,7 +83,7 @@ const Page: React.FC = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search Spotify tracks..."
-            className="w-full h-[48px] bg-[#2F2E36] rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
+            className="w-full h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
             onFocus={() => setShowResults(true)}
           />
           <Image

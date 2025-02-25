@@ -25,7 +25,7 @@ const NavigationItem = ({
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute left-0 w-[3px] h-[24px] bg-[#00FF99] rounded-tr-[2px] rounded-br-[2px] origin-top"
+            className="absolute left-0 w-[3px] h-[24px] bg-primary rounded-tr-[2px] rounded-br-[2px] origin-top"
           />
         )}
 
@@ -36,7 +36,7 @@ const NavigationItem = ({
           transition={{ duration: 0.3, ease: "easeOut" }}
           className={`cursor-pointer w-[52px] h-[52px] flex items-center justify-center rounded-[12px] transition-all duration-300 ${
             isActive
-              ? "bg-gradient-to-br from-[#00FF99] to-[#026F69]" // Active Gradient
+              ? "bg-gradient-to-br from-primary to-[#026F69]" // Active Gradient
               : "hover:bg-[#2A2932]" // Hover Effect
           }`}
         >

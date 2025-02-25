@@ -235,7 +235,7 @@ const MusicPlayer: React.FC = () => {
             }}
           >
             <div
-              className="absolute h-full bg-[#00FF99] rounded-full"
+              className="absolute h-full bg-primary rounded-full"
               style={{
                 width: `${
                   currentTrack && currentTrack.duration

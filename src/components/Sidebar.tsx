@@ -9,7 +9,7 @@ import Link from "next/link";
 const Sidebar = () => {
   return (
     <div className="fixed hidden md:flex">
-      <div className="h-[calc(100vh-100px)] w-[144px] bg-[#1D1C24] flex items-center justify-between flex-col py-[28px] rounded-br-lg">
+      <div className="h-[calc(100vh-100px)] w-[144px] bg-secondary flex items-center justify-between flex-col py-[28px] rounded-br-lg">
         <Link href="/">
           <Image
             src="/images/Logo.svg"
@@ -19,7 +19,7 @@ const Sidebar = () => {
             className="w-[64px] h-[26px]"
           />
         </Link>
-        <div className="bg-[#2F2E36] h-[240px] gap-[8px] rounded-[12px] flex flex-col justify-center items-center">
+        <div className="bg-container h-[240px] gap-[8px] rounded-[12px] flex flex-col justify-center items-center">
           <NavigationItem icon="/icons/Home.svg" alt="home" anchor="/" />
           <NavigationItem
             icon="/icons/Heart.svg"

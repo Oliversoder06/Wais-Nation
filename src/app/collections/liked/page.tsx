@@ -10,7 +10,7 @@ const Liked = () => {
     <div>
       <div className="hidden md:flex flex-col gap-8 md:pb-[50px] ">
         <CollectionsHeader
-          gradient="from-[#1D1C24] to-[#0E3B2D]"
+          gradient="from-secondary to-[#0E3B2D]"
           image="LikedTracks"
           text="Liked Songs"
           type={`${amount} Songs`}
@@ -49,7 +49,7 @@ const Liked = () => {
       </div>
 
       {/* MOBILE VIEW */}
-      <div className="flex flex-col md:hidden px-[16px] bg-gradient-to-t from-[#1D1C24] to-[#005E38] h-[150px] gap-16 ">
+      <div className="flex flex-col md:hidden px-[16px] bg-gradient-to-t from-secondary to-[#005E38] h-[150px] gap-16 ">
         <div className="flex justify-between w-full items-center mt-[48px]">
           <div className="flex flex-col">
             <span className="font-bold text-white text-[24px]">

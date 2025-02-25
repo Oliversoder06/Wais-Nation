@@ -39,7 +39,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
     <div className="relative w-full">
       <Link
         href={id ? `/collections/playlists/${id}` : "#"}
-        className="bg-[#2c2a36] hover:bg-[#32303d] cursor-pointer w-full h-[96px] md:h-[120px] rounded-[8px] flex items-center justify-between px-[8px] pr-[32px] "
+        className="bg-container hover:bg-hover_container cursor-pointer w-full h-[96px] md:h-[120px] rounded-[8px] flex items-center justify-between px-[8px] pr-[32px] "
       >
         <div className="flex gap-4 items-center">
           {/* Playlist Image Placeholder */}
@@ -117,7 +117,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
               open: { opacity: 1, scale: 1, y: 0 },
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute left-50 top-[50%] mt-4 w-36 bg-[#1D1C24] rounded-[8px] shadow-lg flex flex-col overflow-hidden select-none"
+            className="absolute left-50 top-[50%] mt-4 w-36 bg-secondary rounded-[8px] shadow-lg flex flex-col overflow-hidden select-none"
           >
             <button
               onClick={handleDelete}

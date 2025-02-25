@@ -80,7 +80,7 @@ const Playlists: React.FC = () => {
         {/* Header Section */}
 
         <CollectionsHeader
-          gradient="from-[#1D1C24] to-[#104344]"
+          gradient="from-secondary to-[#104344]"
           image="Playlist"
           text="Your Playlists"
           type={`${amount} playlists`}
@@ -111,7 +111,7 @@ const Playlists: React.FC = () => {
         {/* Modal for Creating Playlist */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-            <div className="bg-[#1D1C24] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+            <div className="bg-secondary p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
               <div className="flex justify-between">
                 <h2 className="text-white text-2xl font-bold">
                   Create New Playlist
@@ -274,7 +274,7 @@ const Playlists: React.FC = () => {
             {/* Modal for Creating Playlist */}
             {showModal && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-                <div className="bg-[#1D1C24] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
+                <div className="bg-secondary p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
                   <div className="flex justify-between">
                     <h2 className="text-white text-2xl font-bold">
                       Create New Playlist
