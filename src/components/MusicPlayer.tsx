@@ -154,32 +154,24 @@ const MusicPlayer: React.FC = () => {
             />
           </div>
         ) : (
-          <div className="w-[56px] h-[56px] bg-[#3a3847]" />
+          <div className="w-[56px] h-[56px] bg-[#3a3847] opacity-0" />
         )}
         <div className="flex flex-col justify-center">
-          {currentTrack ? (
+          {currentTrack && (
             <Link
               href={`/track/${spotifyTrackId || "unknown"}`}
               className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]"
             >
-              {currentTrack.title || "No Song"}
+              {currentTrack.title || ""}
             </Link>
-          ) : (
-            <span className="text-white font-semibold text-[20px] truncate max-w-[200px]">
-              No Song
-            </span>
           )}
-          {currentTrack ? (
+          {currentTrack && (
             <Link
               href={`/artist/${artistId || "unknown"}`}
               className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]"
             >
-              {currentTrack.artist || "Unknown Artist"}
+              {currentTrack.artist || ""}
             </Link>
-          ) : (
-            <span className="text-[#ABAAB8] font-semibold truncate max-w-[200px]">
-              Unknown Artist
-            </span>
           )}
         </div>
       </div>
@@ -195,7 +187,7 @@ const MusicPlayer: React.FC = () => {
             className={`w-auto h-auto ${
               history.length > 0
                 ? "opacity-100 hover:opacity-80 cursor-pointer"
-                : "opacity-50 hover:opacity-40"
+                : "opacity-50 hover:opacity-40 cursor-not-allowed"
             }`}
             onClick={playPrevious}
           />
@@ -205,7 +197,11 @@ const MusicPlayer: React.FC = () => {
             width={36}
             height={36}
             onClick={handlePlayPause}
-            className="cursor-pointer hover:opacity-80"
+            className={`${
+              history.length === 0 && queue.length === 0 && !currentTrack
+                ? "opacity-50 hover:opacity-40 cursor-not-allowed"
+                : "cursor-pointer hover:opacity-80"
+            } `}
           />
           <Image
             src="/icons/nextsong.svg"
@@ -214,16 +210,20 @@ const MusicPlayer: React.FC = () => {
             height={24}
             className={`w-auto h-auto ${
               queue.length === 0
-                ? "opacity-50 hover:opacity-40"
+                ? "opacity-50 hover:opacity-40 cursor-not-allowed"
                 : "opacity-100 hover:opacity-80 cursor-pointer"
             }`}
             onClick={playNext}
           />
         </div>
         <div className="flex items-center gap-4">
-          <p className="text-sm text-gray-400">{formatDuration(currentTime)}</p>
+          <p className="text-sm text-gray-400 text-nowrap">
+            {currentTrack ? formatDuration(currentTime) : "-:--"}
+          </p>
           <div
-            className="relative w-full h-[4px] bg-[#2A2A2A] rounded-full cursor-pointer"
+            className={`relative w-full h-[4px] bg-[#2A2A2A] rounded-full ${
+              !currentTrack ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
             onClick={(e) => {
               if (!playerRef.current || !currentTrack) return;
               const rect = e.currentTarget.getBoundingClientRect();
@@ -245,8 +245,8 @@ const MusicPlayer: React.FC = () => {
               }}
             ></div>
           </div>
-          <p className="text-sm text-gray-400">
-            {formatDuration(currentTrack?.duration || 0)}
+          <p className="text-sm text-gray-400 text-nowrap">
+            {currentTrack ? formatDuration(currentTrack.duration) : "-:--"}
           </p>
         </div>
       </div>
