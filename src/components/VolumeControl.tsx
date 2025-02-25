@@ -40,7 +40,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   };
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center ">
       <Image
         src={
           volume === 0
@@ -50,13 +50,13 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
             : "/icons/volumedown.svg"
         }
         alt="volume"
-        width={36}
-        height={36}
+        width={32}
+        height={32}
         className="cursor-pointer hover:opacity-80"
         onClick={toggleMute}
       />
       {showSlider && (
-        <div className="pb-1 pl-2">
+        <div className="">
           <input
             type="range"
             min="0"

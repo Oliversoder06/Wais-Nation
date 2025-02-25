@@ -31,6 +31,11 @@ export async function searchYouTube(
     const videoDetailsResponse = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoId}&key=${API_KEY}`
     );
+    if (!videoDetailsResponse.ok) {
+      console.log(
+        "Error fetching video details:" + videoDetailsResponse.statusText
+      );
+    }
     const videoDetails = await videoDetailsResponse.json();
 
     if (!videoDetails.items || videoDetails.items.length === 0) {
