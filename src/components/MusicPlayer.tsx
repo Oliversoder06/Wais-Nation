@@ -6,8 +6,6 @@ import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 import Link from "next/link";
 import { searchSpotify } from "@/lib/spotify";
-
-// Define our own enum for player states
 enum YouTubePlayerState {
   UNSTARTED = -1,
   ENDED = 0,
@@ -17,12 +15,10 @@ enum YouTubePlayerState {
   CUED = 5,
 }
 
-// Define our own interface for onStateChange events
 interface YouTubeOnStateChangeEvent {
   data: number;
 }
 
-// Extend the YT.Player interface to include getCurrentTime and seekTo
 interface ExtendedYTPlayer extends YT.Player {
   getCurrentTime(): number;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
@@ -40,28 +36,23 @@ const MusicPlayer: React.FC = () => {
   } = useMusicStore();
 
   const playerRef = useRef<YT.Player | null>(null);
-  // Lift volume state to MusicPlayer
   const [volume, setVolume] = useState(50);
   const [spotifyTrackId, setSpotifyTrackId] = useState<string | null>(null);
   const [artistId, setArtistId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // When a new track loads, load its YouTube video
   useEffect(() => {
     if (playerRef.current && currentTrack) {
       playerRef.current.loadVideoById(currentTrack.videoId);
     }
   }, [currentTrack]);
 
-  // Fetch the correct Spotify ID and Artist ID when a new track plays
   useEffect(() => {
     async function fetchSpotifyId() {
       if (currentTrack) {
         try {
-          // Create a search query based on track title and artist
           const query = `${currentTrack.title} ${currentTrack.artist}`;
-          // Search Spotify for the track
           const searchResults = await searchSpotify({ query, limit: 1 });
           if (
             searchResults &&
@@ -105,7 +96,6 @@ const MusicPlayer: React.FC = () => {
     setCurrentTime(0);
   }, [currentTrack]);
 
-  // Poll the player's current time using onStateChange
   const onPlayerStateChange = (event: YouTubeOnStateChangeEvent) => {
     if (event.data === YouTubePlayerState.PLAYING) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -125,7 +115,6 @@ const MusicPlayer: React.FC = () => {
     }
   };
 
-  // Clean up the interval on unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
