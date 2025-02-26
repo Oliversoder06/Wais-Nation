@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 
 interface VolumeControlProps {
@@ -16,12 +16,11 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   const [lastVolume, setLastVolume] = React.useState(volume);
   const showSlider = true;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (playerRef.current) {
       playerRef.current.setVolume(volume);
     }
-  }, [volume, playerRef]);
-
+  }, [playerRef.current]);
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
