@@ -217,7 +217,7 @@ const Sideplayer = () => {
             <span className="text-[#ABAABB] font-medium">{artistName}</span>
           </div>
           <Image
-            src={isLiked ? "/icons/heart.svg" : "/icons/emptyheart.svg"}
+            src={isLiked ? "/icons/Heart.svg" : "/icons/emptyheart.svg"}
             alt="like button"
             width={28}
             height={28}
