@@ -78,7 +78,8 @@ export default function LongSongCard({
       albumCover: result.thumbnail || cover || "/default-cover.jpg",
       videoId: result.videoId,
       spotifyTrackId: "",
-      duration: parseDuration(result.duration), // Convert "3:22" to seconds
+      duration: parseDuration(result.duration),
+      album: "",
     });
     setLoading(false);
   };

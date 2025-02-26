@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 type Track = {
+  album: string;
   spotifyTrackId: string;
   id: string;
   title: string;

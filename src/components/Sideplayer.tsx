@@ -7,17 +7,79 @@ import {
   getArtistDetails,
   SpotifyArtistDetails,
 } from "@/lib/spotify";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
 
 const Sideplayer = () => {
   const { currentTrack } = useMusicStore();
+  const { userId } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [open, setOpen] = useState(false);
   const [artistId, setArtistId] = useState<string | null>(null);
   const [artistDetails, setArtistDetails] =
     useState<SpotifyArtistDetails | null>(null);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+  // Check if the current track is already liked
+  useEffect(() => {
+    async function checkLiked() {
+      if (currentTrack && userId) {
+        const { data, error } = await supabase
+          .from("liked_songs")
+          .select("*")
+          .eq("user_id", userId)
+          .eq("title", currentTrack.title)
+          .eq("artist", currentTrack.artist)
+          .maybeSingle();
+        if (!error && data) {
+          setIsLiked(true);
+        } else {
+          setIsLiked(false);
+        }
+      }
+    }
+    checkLiked();
+  }, [currentTrack, userId]);
+
+  const handleLike = async (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!userId) {
+      toast.error("Please sign in to like songs");
+      return;
+    }
+    if (!currentTrack) return;
+
+    if (isLiked) {
+      // Remove the liked song from the table
+      const { error } = await supabase.from("liked_songs").delete().match({
+        user_id: userId,
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+      });
+      if (error) {
+        toast.error("Error unliking song");
+      } else {
+        toast.success("Song unliked");
+        setIsLiked(false);
+      }
+    } else {
+      // Insert the liked song into the table
+      const { error } = await supabase.from("liked_songs").insert({
+        user_id: userId,
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        album: currentTrack.album, // if available
+        duration: currentTrack.duration, // if available
+        cover: currentTrack.albumCover,
+        added_at: new Date().toISOString(),
+      });
+      if (error) {
+        toast.error("Error liking song");
+      } else {
+        toast.success("Song liked!");
+        setIsLiked(true);
+      }
+    }
   };
 
   const handleOpen = () => {
@@ -36,7 +98,6 @@ const Sideplayer = () => {
             searchResults.tracks.items.length > 0
           ) {
             const spotifyTrack = searchResults.tracks.items[0];
-            // Use spotifyTrack.id if needed, otherwise ignore it
             if (spotifyTrack.artists && spotifyTrack.artists.length > 0) {
               setArtistId(spotifyTrack.artists[0].id);
             } else {
@@ -79,7 +140,6 @@ const Sideplayer = () => {
         backgroundImage: `url(${albumCover})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        // filter: "blur(8px)",
       }
     : {};
 
@@ -105,7 +165,6 @@ const Sideplayer = () => {
               className="w-[364px] right-0 h-[calc(100vh-100px)] flex flex-col justify-end p-[20px] gap-[40px] z-50 fixed rounded-bl-lg"
               style={containerStyle}
             >
-              {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex flex-col leading-[32px]">
@@ -148,9 +207,7 @@ const Sideplayer = () => {
         className="w-[364px] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[40px] hidden rounded-bl-lg"
         style={containerStyle}
       >
-        {/* Dark overlay to darken only the background image */}
         <div className="absolute inset-0 bg-secondary opacity-[0.85]"></div>
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex flex-col leading-[32px]">
