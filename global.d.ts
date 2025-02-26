@@ -1,6 +1,9 @@
 declare global {
   namespace YT {
     class Player {
+      getIframe() {
+        throw new Error("Method not implemented.");
+      }
       seekTo(newTime: number, arg1: boolean) {
         throw new Error("Method not implemented.");
       }

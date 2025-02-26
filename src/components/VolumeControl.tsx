@@ -16,30 +16,64 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   const [lastVolume, setLastVolume] = React.useState(volume);
   const showSlider = true;
 
+  // Poll until the player is fully ready (i.e. the iframe has a valid src)
   useEffect(() => {
-    if (playerRef.current) {
-      playerRef.current.setVolume(volume);
-    }
-  }, [playerRef.current]);
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const updateVolumeWhenReady = () => {
+      const player = playerRef.current;
+      if (player) {
+        // Cast the result of getIframe() from unknown to HTMLIFrameElement
+        const iframe = player.getIframe() as unknown as HTMLIFrameElement;
+        if (iframe && iframe.src) {
+          player.setVolume(volume);
+          return;
+        }
+      }
+      timeoutId = setTimeout(updateVolumeWhenReady, 100);
+    };
+
+    updateVolumeWhenReady();
+
+    return () => clearTimeout(timeoutId);
+  }, [volume, playerRef]);
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
     if (playerRef.current) {
-      playerRef.current.setVolume(newVolume);
+      const iframe =
+        playerRef.current.getIframe() as unknown as HTMLIFrameElement;
+      if (iframe && iframe.src) {
+        playerRef.current.setVolume(newVolume);
+      }
     }
   };
 
   const toggleMute = () => {
     if (volume === 0) {
       setVolume(lastVolume);
+      if (playerRef.current) {
+        const iframe =
+          playerRef.current.getIframe() as unknown as HTMLIFrameElement;
+        if (iframe && iframe.src) {
+          playerRef.current.setVolume(lastVolume);
+        }
+      }
     } else {
       setLastVolume(volume);
       setVolume(0);
+      if (playerRef.current) {
+        const iframe =
+          playerRef.current.getIframe() as unknown as HTMLIFrameElement;
+        if (iframe && iframe.src) {
+          playerRef.current.setVolume(0);
+        }
+      }
     }
   };
 
   return (
-    <div className="relative flex items-center justify-center ">
+    <div className="relative flex items-center justify-center">
       <Image
         src={
           volume === 0
@@ -55,7 +89,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
         onClick={toggleMute}
       />
       {showSlider && (
-        <div className="">
+        <div>
           <input
             type="range"
             min="0"

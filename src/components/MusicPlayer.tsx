@@ -6,6 +6,7 @@ import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
 import Link from "next/link";
 import { searchSpotify } from "@/lib/spotify";
+
 enum YouTubePlayerState {
   UNSTARTED = -1,
   ENDED = 0,
@@ -42,11 +43,25 @@ const MusicPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Poll until the player is ready before loading a new video.
   useEffect(() => {
-    if (playerRef.current && currentTrack) {
-      console.log("Loading video:", currentTrack.videoId); // ✅ Debug log
-      playerRef.current.loadVideoById(currentTrack.videoId); // ✅ Ensure this loads the correct video
-    }
+    if (!currentTrack) return;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const loadVideoWhenReady = () => {
+      if (playerRef.current) {
+        // Cast to HTMLIFrameElement so we can check for src
+        const iframe =
+          playerRef.current.getIframe() as unknown as HTMLIFrameElement;
+        if (iframe && iframe.src) {
+          console.log("Loading video:", currentTrack.videoId);
+          playerRef.current.loadVideoById(currentTrack.videoId);
+          return;
+        }
+      }
+      timeoutId = setTimeout(loadVideoWhenReady, 100);
+    };
+    loadVideoWhenReady();
+    return () => clearTimeout(timeoutId);
   }, [currentTrack]);
 
   useEffect(() => {
@@ -261,7 +276,7 @@ const MusicPlayer: React.FC = () => {
       {currentTrack && (
         <div className="hidden">
           <YouTube
-            videoId={currentTrack?.videoId}
+            videoId={currentTrack.videoId}
             opts={{
               height: "0",
               width: "0",
@@ -269,8 +284,8 @@ const MusicPlayer: React.FC = () => {
             }}
             onReady={(event) => {
               playerRef.current = event.target;
-              console.log("YouTube Player Ready!"); // ✅ Debug log
-              event.target.playVideo(); // ✅ Auto-play when ready
+              console.log("YouTube Player Ready!");
+              event.target.playVideo();
             }}
             onStateChange={onPlayerStateChange}
             onEnd={playNext}

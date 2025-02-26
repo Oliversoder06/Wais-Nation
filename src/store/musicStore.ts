@@ -17,6 +17,7 @@ type PlayerState = {
   isPlaying: boolean;
   playbackPosition: number; // NEW: current time in seconds
   volume: number; // NEW: volume level
+  videoId?: string;
 
   playTrack: (track: Track) => void;
   playNext: () => void;

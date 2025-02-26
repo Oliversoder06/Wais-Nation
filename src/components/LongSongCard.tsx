@@ -97,22 +97,28 @@ export default function LongSongCard({
         } cursor-pointer w-full md:h-[80px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16`}
       >
         <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
-          {cover ? (
-            <Image
-              src={cover}
-              alt={title}
-              width={56}
-              height={56}
-              className="rounded-[8px]"
-            />
+          {loading ? (
+            <div className="loader" />
           ) : (
-            <Image
-              src="/images/Playlist.svg"
-              alt="Song Cover"
-              width={48}
-              height={48}
-              className="rounded-md"
-            />
+            <div>
+              {cover ? (
+                <Image
+                  src={cover}
+                  alt={title}
+                  width={56}
+                  height={56}
+                  className="rounded-[8px]"
+                />
+              ) : (
+                <Image
+                  src="/images/Playlist.svg"
+                  alt="Song Cover"
+                  width={48}
+                  height={48}
+                  className="rounded-md"
+                />
+              )}
+            </div>
           )}
           <div className="flex flex-col leading-[24px] overflow-hidden">
             <span
