@@ -43,13 +43,12 @@ const MusicPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Poll until the player is ready before loading a new video.
+  // When a new track is loaded, wait for the player to be ready and load the video.
   useEffect(() => {
     if (!currentTrack) return;
     let timeoutId: ReturnType<typeof setTimeout>;
     const loadVideoWhenReady = () => {
       if (playerRef.current) {
-        // Cast to HTMLIFrameElement so we can check for src
         const iframe =
           playerRef.current.getIframe() as unknown as HTMLIFrameElement;
         if (iframe && iframe.src) {
@@ -269,6 +268,7 @@ const MusicPlayer: React.FC = () => {
           volume={volume}
           setVolume={setVolume}
           playerRef={playerRef}
+          currentVideoId={currentTrack?.videoId} // Pass the videoId so VolumeControl re-runs on track change
         />
       </div>
 
@@ -284,7 +284,9 @@ const MusicPlayer: React.FC = () => {
             }}
             onReady={(event) => {
               playerRef.current = event.target;
-              console.log("YouTube Player Ready!");
+              // Immediately set the volume on the new player
+              event.target.setVolume(volume);
+              console.log("YouTube Player Ready! Volume set to", volume);
               event.target.playVideo();
             }}
             onStateChange={onPlayerStateChange}

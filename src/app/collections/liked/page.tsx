@@ -1,12 +1,51 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import CollectionsHeader from "@/components/CollectionsHeader";
 import LongSongCard from "@/components/LongSongCard";
 import Image from "next/image";
-import useLikedSongs, { LikedSong } from "@/hooks/useLikedSongs";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
 
-// Format ISO timestamp to "YYYY-MM-DD"
-function formatDate(isoString: string): string {
+function useLikedSongs() {
+  const { userId } = useAuth();
+  interface LikedSong {
+    id: string;
+    title: string;
+    artist: string;
+    album?: string;
+    added_at: string;
+    duration: string;
+    cover: string;
+  }
+
+  const [likedSongs, setLikedSongs] = useState<LikedSong[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    async function fetchLikedSongs() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("liked_songs")
+        .select("*")
+        .eq("user_id", userId)
+        .order("added_at", { ascending: false });
+      if (error) {
+        toast.error("Error fetching liked songs");
+      } else {
+        setLikedSongs(data || []);
+      }
+      setLoading(false);
+    }
+    fetchLikedSongs();
+  }, [userId]);
+
+  return { likedSongs, loading };
+}
+
+// Utility function to format ISO timestamp into a user-friendly string
+function formatDate(isoString: string | number | Date) {
   const date = new Date(isoString);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -14,8 +53,8 @@ function formatDate(isoString: string): string {
   return `${year}-${month}-${day}`;
 }
 
-// Convert duration (in seconds) to "mm:ss"
-function formatDuration(durationInSeconds: string): string {
+// Utility function to convert duration (seconds) to "mm:ss"
+function formatDuration(durationInSeconds: string) {
   const seconds = parseInt(durationInSeconds, 10);
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
@@ -59,15 +98,15 @@ const Liked = () => {
               No liked songs found.
             </p>
           ) : (
-            likedSongs.map((song: LikedSong) => (
+            likedSongs.map((song) => (
               <LongSongCard
                 key={song.id}
                 title={song.title}
                 artist={song.artist}
-                album={song.album || ""}
+                album={song.album || "Album"}
                 date={formatDate(song.added_at)}
                 duration={formatDuration(song.duration)}
-                cover={song.cover || ""}
+                cover={song.cover}
               />
             ))
           )}
@@ -95,15 +134,15 @@ const Liked = () => {
               No liked songs found.
             </p>
           ) : (
-            likedSongs.map((song: LikedSong) => (
+            likedSongs.map((song) => (
               <LongSongCard
                 key={song.id}
                 title={song.title}
                 artist={song.artist}
-                album={song.album || ""}
+                album={song.album || "Album"}
                 date={formatDate(song.added_at)}
                 duration={formatDuration(song.duration)}
-                cover={song.cover || ""}
+                cover={song.cover}
               />
             ))
           )}

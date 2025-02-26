@@ -1,17 +1,19 @@
 "use client";
-import React, { useEffect } from "react";
 import Image from "next/image";
+import React, { useEffect } from "react";
 
 interface VolumeControlProps {
   playerRef: React.MutableRefObject<YT.Player | null>;
   volume: number;
   setVolume: (volume: number) => void;
+  currentVideoId?: string; // New prop to signal when the video changes
 }
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   playerRef,
   volume,
   setVolume,
+  currentVideoId,
 }) => {
   const [lastVolume, setLastVolume] = React.useState(volume);
   const showSlider = true;
@@ -22,7 +24,6 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
     const updateVolumeWhenReady = () => {
       const player = playerRef.current;
       if (player) {
-        // Cast the result of getIframe() from unknown to HTMLIFrameElement
         const iframe = player.getIframe() as unknown as HTMLIFrameElement;
         if (iframe && iframe.src) {
           player.setVolume(volume);
@@ -35,7 +36,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
     updateVolumeWhenReady();
 
     return () => clearTimeout(timeoutId);
-  }, [volume, playerRef]);
+  }, [volume, currentVideoId, playerRef]);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseInt(e.target.value, 10);
