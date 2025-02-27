@@ -107,7 +107,9 @@ const Page: React.FC = () => {
                     }}
                   >
                     <Image
-                      src={track.album.images[0].url}
+                      src={
+                        track.album.images?.[0]?.url || "/images/Playlist.svg"
+                      }
                       alt="album cover"
                       width={40}
                       height={40}
