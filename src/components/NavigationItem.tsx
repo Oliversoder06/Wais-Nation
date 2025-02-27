@@ -48,11 +48,11 @@ const NavigationItem = ({
         </motion.div>
       </div>
       <span
-        className={`absolute left-[100px] select-none text-xs  px-2 py-1 rounded-full transition-all duration-300 ${
+        className={`absolute select-none text-xs  px-2 py-1 rounded-full transition-all duration-300 ${
           isExpanded
             ? isActive
-              ? "text-primary font-bold"
-              : "text-white opacity-80"
+              ? "text-primary font-bold left-[100px]"
+              : "text-white opacity-60 left-[90px]"
             : "hidden"
         }`}
       >

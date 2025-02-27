@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
-    <div className="fixed hidden md:flex">
+    <div className="fixed hidden md:flex z-[80]">
       <motion.div
         onHoverStart={() => setIsExpanded(true)}
         onHoverEnd={() => setIsExpanded(false)}
@@ -51,7 +51,7 @@ const Sidebar = () => {
             icon="/icons/Playlist.svg"
             alt="playlist"
             anchor="/collections/playlists"
-            label="Playlist"
+            label="Library"
             isExpanded={isExpanded}
           />
         </motion.div>
