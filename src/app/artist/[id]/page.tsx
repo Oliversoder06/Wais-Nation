@@ -34,15 +34,22 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   // We'll reuse followers.total as "monthly listeners" for demonstration
   const monthlyListeners = artist.followers.total.toLocaleString();
 
+  // Cloudinary transformation URL with face detection.
+  // Adjust the width (w_1200) and height (h_400) as needed.
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const artistBgImage = artist.images?.[0]?.url
+    ? `https://res.cloudinary.com/${cloudName}/image/fetch/w_1200,h_400,c_fill,g_face/${artist.images[0].url}`
+    : "none";
+
   return (
     <div className="flex flex-col text-white bg-secondary min-h-screen">
       {/* Hero / Banner Section */}
       <div
-        className="relative w-full h-80 bg-cover bg-center flex items-end p-8"
+        className="relative w-full h-[400px] bg-center bg-cover flex items-end p-8"
         style={{
-          backgroundImage: artist.images?.[0]?.url
-            ? `url(${artist.images[0].url})`
-            : "none",
+          backgroundImage:
+            artistBgImage !== "none" ? `url(${artistBgImage})` : "none",
+          backgroundPosition: "50% 50%",
         }}
       >
         {/* Dark overlay for contrast */}
@@ -57,7 +64,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           <p className="mt-2 text-sm text-gray-200">
             {monthlyListeners} monthly listeners
           </p>
-          <button className="mt-4 bg-green-500 text-black px-4 py-2 rounded-full font-semibold hover:bg-green-400 transition">
+          <button className="mt-4 bg-green-500 text-black px-28 py-2 rounded-full font-semibold hover:bg-green-400 transition w-max">
             Follow
           </button>
         </div>
@@ -66,8 +73,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
       {/* Popular Tracks Section */}
       <div className="p-[40px]">
         <h2 className="text-2xl font-bold mb-4">Popular</h2>
-        <div className=" flex flex-col gap-4">
-          {/* <h2 className="text-2xl font-bold mb-4">Popular</h2> */}
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
               <span className="w-[48px] h-[48px]" />
@@ -87,11 +93,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 title={track.name}
                 artist={track.artists.map((a) => a.name).join(", ")}
                 album={track.album.name}
-                date={
-                  track.album.release_date
-                    ? track.album.release_date
-                    : "Unknown"
-                }
+                date={track.album.release_date || "Unknown"}
                 duration={formatDuration(track.duration_ms)}
                 cover={track.album.images?.[0]?.url}
               />
