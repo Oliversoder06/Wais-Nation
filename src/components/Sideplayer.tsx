@@ -131,8 +131,8 @@ const Sideplayer = () => {
   }, [artistId]);
 
   const albumCover = currentTrack?.albumCover || "";
-  const songTitle = currentTrack?.title || "No Song";
-  const artistName = currentTrack?.artist || "Unknown Artist";
+  const songTitle = currentTrack?.title || "No Title";
+  const artistName = currentTrack?.artist || "No Artist";
   const artistPfp = artistDetails?.images?.[0]?.url;
 
   const containerStyle = albumCover
@@ -158,17 +158,19 @@ const Sideplayer = () => {
         {open && (
           <div>
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              className="fixed inset-0 bg-black bg-opacity-50 z-[80]"
               onClick={handleOpen}
             ></div>
             <div
-              className="w-[364px] right-0 h-[calc(100vh-100px)] flex flex-col justify-end p-[20px] gap-[40px] z-50 fixed rounded-bl-lg"
+              className="w-[300px] right-0 h-[calc(100vh-100px)] flex flex-col justify-end p-[20px] gap-[20px] z-[80] fixed rounded-bl-lg"
               style={containerStyle}
             >
+              <div className="absolute inset-0 bg-secondary opacity-[0.90]"></div>
               <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+
               <div className="relative z-10 flex items-center justify-between">
                 <div className="flex flex-col leading-[32px]">
-                  <span className="text-white font-semibold text-[32px]">
+                  <span className="text-white font-bold text-[24px]">
                     {songTitle}
                   </span>
                   <span className="text-[#ABAABB] font-medium">
@@ -176,7 +178,7 @@ const Sideplayer = () => {
                   </span>
                 </div>
                 <Image
-                  src={isLiked ? "/icons/heart.svg" : "/icons/empty-heart.svg"}
+                  src={isLiked ? "/icons/Heart.svg" : "/icons/emptyheart.svg"}
                   alt="like button"
                   width={28}
                   height={28}
@@ -184,17 +186,16 @@ const Sideplayer = () => {
                   className="cursor-pointer hover:opacity-80 relative z-10"
                 />
               </div>
-              <div className="relative z-10">
-                {artistPfp ? (
+
+              <div className="relative z-10 mx-auto">
+                {artistPfp && (
                   <Image
                     src={artistPfp}
                     alt="Artist Profile"
-                    width={364}
-                    height={300}
-                    className="w-full h-[300px] object-cover rounded-lg"
+                    width={280}
+                    height={280}
+                    className="object-cover rounded-lg"
                   />
-                ) : (
-                  <div className="h-[300px] w-full bg-[#3a3847] rounded-lg"></div>
                 )}
               </div>
             </div>
@@ -204,14 +205,14 @@ const Sideplayer = () => {
 
       {/* Desktop Sidebar */}
       <div
-        className="w-[364px] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[40px] hidden rounded-bl-lg"
+        className="w-[364px] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[20px] hidden rounded-bl-lg"
         style={containerStyle}
       >
-        <div className="absolute inset-0 bg-secondary opacity-[0.85]"></div>
+        <div className="absolute inset-0 bg-secondary opacity-[0.90]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex flex-col leading-[32px]">
-            <span className="text-white font-semibold text-[32px]">
+            <span className="text-white font-bold text-[24px]">
               {songTitle}
             </span>
             <span className="text-[#ABAABB] font-medium">{artistName}</span>
@@ -225,17 +226,15 @@ const Sideplayer = () => {
             className="cursor-pointer hover:opacity-80 relative z-10"
           />
         </div>
-        <div className="relative z-10">
-          {artistPfp ? (
+        <div className="relative z-10 mx-auto">
+          {artistPfp && (
             <Image
               src={artistPfp}
               alt="Artist Profile"
-              width={364}
-              height={300}
-              className="w-full h-[300px] object-cover rounded-lg"
+              width={280}
+              height={280}
+              className="object-cover rounded-lg"
             />
-          ) : (
-            <div className="h-[300px] w-full bg-container rounded-lg"></div>
           )}
         </div>
       </div>
