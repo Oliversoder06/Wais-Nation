@@ -200,3 +200,30 @@ export async function getArtistTopTracks(
     return null;
   }
 }
+
+export async function getArtistAlbums(
+  artistId: string
+): Promise<SpotifyAlbum[] | null> {
+  try {
+    const token = await getSpotifyToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/artists/${artistId}/albums?market=US`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get artist albums: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.items as SpotifyAlbum[];
+  } catch (error) {
+    console.error("Error fetching artist albums:", error);
+    return null;
+  }
+}

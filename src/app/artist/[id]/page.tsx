@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
-import { getArtistDetails, getArtistTopTracks } from "@/lib/spotify";
+import {
+  getArtistDetails,
+  getArtistTopTracks,
+  getArtistAlbums,
+} from "@/lib/spotify";
 import LongSongCard from "@/components/LongSongCard";
-// Make sure these are exported from your spotify.ts
-// getArtistTopTracks is a function you'll define to fetch popular tracks for an artist
+import AlbumCard from "@/components/AlbumCard";
 
 interface ArtistPageProps {
-  // Important: declare `params` as a Promise, not an object
   params: Promise<{ id: string }>;
 }
 
@@ -28,6 +30,12 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   // 3) Fetch artist’s top tracks
   const topTracks = await getArtistTopTracks(id);
   if (!topTracks) {
+    notFound();
+  }
+
+  // 4) Fetch artist’s albums
+  const albums = await getArtistAlbums(id);
+  if (!albums) {
     notFound();
   }
 
@@ -69,7 +77,6 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           </button>
         </div>
       </div>
-
       {/* Popular Tracks Section */}
       <div className="p-[40px]">
         <h2 className="text-2xl font-bold mb-4">Popular</h2>
@@ -98,6 +105,23 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 cover={track.album.images?.[0]?.url}
               />
             ))}
+          </div>
+
+          <div className="mt-8">
+            {/* SHOW ALBUMS */}
+            <h2 className="text-2xl font-bold mb-4">Albums</h2>
+            <div className="flex overflow-auto">
+              {albums &&
+                albums.map((album) => (
+                  <div key={album.id} className="flex-shrink-0 ">
+                    <AlbumCard
+                      albumCover={album.images?.[0]?.url}
+                      albumTitle={album.name}
+                      artistName={artist.name}
+                    />
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>
