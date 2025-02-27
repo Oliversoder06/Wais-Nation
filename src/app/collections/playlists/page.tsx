@@ -207,8 +207,8 @@ const Playlists: React.FC = () => {
       </div>
 
       {/* MOBILE VIEW */}
-      <div className="pb-[100px] flex flex-col md:hidden px-[16px] mt-[15px]">
-        <div className="">
+      <div className="pb-[100px] flex flex-col md:hidden px-[16px]  bg-gradient-to-t from-secondary to-[#104344] h-[150px] gap-16">
+        <div className="flex justify-between w-full items-center mt-[48px]">
           <div className="flex justify-between w-full items-center">
             <div className="flex flex-col">
               <span className="font-bold text-white text-[24px]">
@@ -241,7 +241,7 @@ const Playlists: React.FC = () => {
         </div>
 
         {/* Playlists Display */}
-        <div className="flex flex-col gap-4 px-[16px] mt-4 md:hidden">
+        <div className="flex flex-col gap-4 mt-4 md:hidden pb-[100px]">
           {loading ? (
             <span className="text-[#ABAABB] text-lg text-center mt-[40px]">
               Loading playlists...

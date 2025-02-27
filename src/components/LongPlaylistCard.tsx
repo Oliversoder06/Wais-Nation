@@ -39,9 +39,9 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
     <div className="relative w-full">
       <Link
         href={id ? `/collections/playlists/${id}` : "#"}
-        className="bg-container hover:bg-hover_container cursor-pointer w-full h-[96px] md:h-[120px] rounded-[8px] flex items-center justify-between px-[8px] pr-[32px] "
+        className="md:bg-container md:hover:bg-hover_container cursor-pointer w-full h-auto md:h-[120px] rounded-[8px] flex items-center justify-between  pr-[32px] "
       >
-        <div className="flex gap-4 items-center">
+        <div className="flex md:gap-4 gap-2 items-center">
           {/* Playlist Image Placeholder */}
           <Image
             src="/images/Playlist.svg"
@@ -53,14 +53,16 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
           />
 
           {/* Playlist Info */}
-          <div className="flex flex-col leading-[24px]">
-            <span className="text-white text-[20px] font-semibold">{name}</span>
+          <div className="flex flex-col leading-5 md:leading-[24px] w-full max-w-[calc(100vw-100px)] md:w-[calc(100vw-400px)] xl:w-[calc(100vw-800px)]">
+            <span className="text-white text-[16px] md:text-[20px] font-semibold truncate">
+              {name}
+            </span>
             <div>
-              <span className="text-[#ABAAB8] text-[16px] hover:underline">
+              <span className="text-[#ABAAB8] text-[14px] md:text-[16px] hover:underline truncate">
                 {owner}
               </span>
             </div>
-            <span className="text-[#6E6D78] text-[14px] hidden md:flex">
+            <span className="text-[#6E6D78] text-[12px] md:text-[14px] block truncate">
               {description || "No description available"}
             </span>
           </div>
@@ -75,7 +77,7 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="absolute top-1/2 right-6 transform -translate-y-1/2 flex items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
+        className="absolute top-1/2 right-6 transform -translate-y-1/2 items-center justify-center w-[40px] h-[40px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10 hidden md:flex"
       >
         {/* Animated 3-Dots (Morphs into Menu) */}
         <motion.div

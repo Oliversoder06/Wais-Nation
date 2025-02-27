@@ -69,12 +69,21 @@ const Liked = () => {
     <div>
       {/* Desktop View */}
       <div className="hidden md:flex flex-col gap-8 md:pb-[50px]">
-        <CollectionsHeader
-          gradient="from-secondary to-[#0E3B2D]"
-          image="LikedTracks"
-          text="Liked Songs"
-          type={`${amount} Songs`}
-        />
+        <div className="relative">
+          <CollectionsHeader
+            gradient="from-secondary to-[#0E3B2D]"
+            image="LikedTracks"
+            text="Liked Songs"
+            type={`${amount} Songs`}
+          />
+          <Image
+            src="/icons/play.svg"
+            alt="play"
+            width={48}
+            height={48}
+            className="absolute top-1/2 right-[40px]"
+          />
+        </div>
 
         <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
           <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
@@ -125,7 +134,7 @@ const Liked = () => {
           </div>
           <Image src="/icons/play.svg" alt="play" width={48} height={48} />
         </div>
-        <div className="flex flex-col gap-[8px] pb-[100px]">
+        <div className="flex flex-col  pb-[100px]">
           {loading ? (
             <p className="text-white">Loading...</p>
           ) : amount === 0 ? (

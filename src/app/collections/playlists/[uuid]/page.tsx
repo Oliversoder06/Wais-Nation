@@ -137,9 +137,12 @@ export default function PlaylistPage() {
           alt="Playlist Image"
           width={200}
           height={200}
+          className="md:w-[200px] md:h-[200px] w-[150px] h-[150px] rounded-lg"
         />
-        <h1 className="text-4xl font-bold mt-4">{playlist.name}</h1>
-        <p className="text-lg text-gray-400 mt-2">
+        <h1 className="md:text-4xl text-2xl font-bold mt-4 max-w-full truncate  md:px-[40px] px-[12px] text-center">
+          {playlist.name}
+        </h1>
+        <p className="md:text-lg text-sm text-gray-400 mt-2 truncate md:px-[40px] px-[12px] max-w-full">
           {playlist.description || "No description available"}
         </p>
       </div>
@@ -214,6 +217,22 @@ export default function PlaylistPage() {
 
       <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
         <div className="flex flex-col gap-1">
+          <div className="md:flex gap-[20px] items-center md:px-4 px-2 pb-2 hidden">
+            <Image
+              src="/icons/play.svg"
+              alt="play"
+              width={48}
+              height={48}
+              className="cursor-pointer"
+            />
+            <Image
+              src="/icons/loop.svg"
+              alt="loop"
+              width={28}
+              height={28}
+              className="opacity-50 hover:opacity-100 hover:scale-110 cursor-pointer transition-all"
+            />
+          </div>
           <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
             <span className="w-[48px] h-[48px]" />
             <span className="text-nit font-semibold">Title</span>
@@ -221,9 +240,20 @@ export default function PlaylistPage() {
             <span className="text-nit font-semibold">Date added</span>
             <span className="text-nit font-semibold text-right">Duration</span>
           </div>
+
           <div className="w-full h-[1px] bg-[#2e2e2e]" />
         </div>
-        <div>
+        <div className="flex flex-col md:mb-0 mb-20">
+          <div className="flex gap-4 items-center px-4 pb-2 md:hidden">
+            <Image src="/icons/play.svg" alt="play" width={48} height={48} />
+            <Image
+              src="/icons/loop.svg"
+              alt="loop"
+              width={28}
+              height={28}
+              className="opacity-50"
+            />
+          </div>
           {track.length === 0 ? (
             <p className="text-gray-400 text-center">
               No tracks added to this playlist yet.

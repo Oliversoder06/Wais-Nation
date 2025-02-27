@@ -40,7 +40,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   }
 
   // We'll reuse followers.total as "monthly listeners" for demonstration
-  const monthlyListeners = artist.followers.total.toLocaleString();
+  const followers = artist.followers.total.toLocaleString();
 
   // Cloudinary transformation URL with face detection.
   // Adjust the width (w_1200) and height (h_400) as needed.
@@ -69,9 +69,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             Verified Artist
           </span>
           <h1 className="text-5xl md:text-6xl font-extrabold">{artist.name}</h1>
-          <p className="mt-2 text-sm text-gray-200">
-            {monthlyListeners} monthly listeners
-          </p>
+          <p className="mt-2 text-sm text-gray-200">{followers} followers</p>
           <button className="mt-4 bg-green-500 text-black px-28 py-2 rounded-full font-semibold hover:bg-green-400 transition w-max">
             Follow
           </button>
