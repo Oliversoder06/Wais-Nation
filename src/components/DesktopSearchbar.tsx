@@ -255,12 +255,16 @@ const DesktopSearchbar: React.FC = () => {
                           }}
                         >
                           <Image
-                            src={track.album.images[0].url}
+                            src={
+                              track.album.images?.[0]?.url ||
+                              "/images/Playlist.svg"
+                            }
                             alt="album cover"
                             width={40}
                             height={40}
                             className="rounded"
                           />
+
                           <div>
                             <p className="font-semibold text-white">
                               {track.name}

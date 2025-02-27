@@ -56,17 +56,19 @@ export default function TrackPage({ params }: TrackPageProps) {
         <div
           className="absolute inset-0 bg-cover bg-center track-bg"
           style={{
-            backgroundImage: `url(${track.album.images[0].url})`,
+            backgroundImage: `url(${
+              track.album.images?.[0]?.url || "/images/Playlist.svg"
+            })`,
           }}
         />
         <div className="relative flex justify-center items-center md:gap-[64px] gap-[32px] h-full">
           <div className="md:size-[248px] size-[200px] rounded-[24px] flex items-center justify-center">
             <Image
-              src={track.album.images[0].url}
-              alt={track.name}
+              src={track.album.images?.[0]?.url || "/images/Playlist.svg"}
+              alt="album cover"
               width={300}
               height={300}
-              className="rounded-md"
+              className="rounded"
             />
           </div>
           <div className="flex flex-col justify-center gap-[8px] text-white">
@@ -103,7 +105,7 @@ export default function TrackPage({ params }: TrackPageProps) {
           album={track.album.name}
           date={track.album.release_date}
           duration={formatDuration(track.duration_ms)}
-          cover={track.album.images[0].url}
+          cover={track.album.images?.[0]?.url || "/images/Playlist.svg"}
         />
       </div>
     </div>

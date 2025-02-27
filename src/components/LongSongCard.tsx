@@ -281,6 +281,29 @@ export default function LongSongCard({
               toast.error("Select at least one playlist.");
               return;
             }
+
+            // Check if the track already exists in any of the selected playlists.
+            const { data: existingTracks, error: fetchError } = await supabase
+              .from("playlist_tracks")
+              .select("id")
+              .in("playlist_id", selectedPlaylists)
+              .eq("title", title)
+              .eq("artist", artist);
+
+            if (fetchError) {
+              console.error("Error checking existing tracks:", fetchError);
+              toast.error("Failed to check existing tracks.");
+              return;
+            }
+
+            if (existingTracks && existingTracks.length > 0) {
+              toast.error(
+                "Track already exists in one of the selected playlists."
+              );
+              return;
+            }
+
+            // Now insert the track into the selected playlists
             const { error } = await supabase.from("playlist_tracks").insert(
               selectedPlaylists.map((playlistId) => ({
                 playlist_id: playlistId,
@@ -289,8 +312,10 @@ export default function LongSongCard({
                 album,
                 duration,
                 cover,
+                // Include track_id if you have one
               }))
             );
+
             if (error) {
               console.error("Error adding track to playlists:", error);
               toast.error("Failed to add track.");
