@@ -227,3 +227,42 @@ export async function getArtistAlbums(
     return null;
   }
 }
+
+export interface SpotifyAlbumDetails {
+  id: string;
+  name: string;
+  artists: SpotifyArtist[];
+  images: SpotifyImage[];
+  release_date: string;
+  total_tracks: number;
+  tracks: {
+    items: SpotifyTrack[];
+  };
+}
+
+export async function getAlbumDetails(
+  albumId: string
+): Promise<SpotifyAlbumDetails | null> {
+  try {
+    const token = await getSpotifyToken();
+    const response = await fetch(
+      `https://api.spotify.com/v1/albums/${albumId}?market=US`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to get album details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as SpotifyAlbumDetails;
+  } catch (error) {
+    console.error("Error fetching album details:", error);
+    return null;
+  }
+}

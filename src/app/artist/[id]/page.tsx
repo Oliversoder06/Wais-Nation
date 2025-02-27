@@ -118,6 +118,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                       albumCover={album.images?.[0]?.url}
                       albumTitle={album.name}
                       artistName={artist.name}
+                      id={album.id}
                     />
                   </div>
                 ))}
