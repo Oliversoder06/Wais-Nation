@@ -1,5 +1,3 @@
-// src/components/LongSongCard.tsx
-
 "use client";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@clerk/nextjs";
@@ -15,7 +13,7 @@ interface LongSongCardProps {
   artist: string;
   album: string;
   date: string;
-  duration: string; // e.g., "3:22" for display purposes
+  duration: string; // e.g., "3:22"
   cover?: string;
 }
 
@@ -50,7 +48,7 @@ export default function LongSongCard({
         .from("playlists")
         .select("id, name, description, user_id");
       if (error) {
-        toast.error("Error fetching playlists:");
+        toast.error("Error fetching playlists");
       } else {
         setPlaylists(data || []);
       }
@@ -60,17 +58,18 @@ export default function LongSongCard({
   }, []);
 
   const handleCardClick = async () => {
-    setLoading(true);
     if (showModal) return;
+    setLoading(true);
+
     const query = `${title} ${artist}`;
     const result = await searchYouTube(query);
 
     if (!result || !result.videoId) {
       console.error("❌ No video found for:", query);
+      setLoading(false);
       return;
     }
 
-    console.log("✅ Playing:", result);
     playTrack({
       id: result.videoId,
       title: result.title,
@@ -87,72 +86,86 @@ export default function LongSongCard({
   const isCurrentSong = currentTrack?.title === title;
 
   return (
-    <div className="w-full" onClick={handleCardClick}>
+    <>
+      {/* Desktop/Tablet Layout (grid-based) */}
       <div
+        onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`${
-          isCurrentSong
-            ? "bg-green-800/20 border-l-4 border-green-400 md:hover:bg-green-800/30"
-            : "bg-container md:hover:bg-hover_container"
-        } cursor-pointer w-full md:h-[80px] h-[64px] rounded-[8px] flex items-center md:px-[16px] px-[8px] gap-16`}
+        className={`
+          hidden md:grid 
+          grid-cols-[48px_1fr_1fr_1fr_72px] 
+          gap-4 px-4 py-2 items-center 
+          rounded-md
+          cursor-pointer
+          ${
+            isCurrentSong
+              ? "bg-green-800/20 border-l-2 border-primary hover:bg-green-800/30"
+              : "bg-transparent hover:bg-container"
+          }
+        `}
       >
-        <div className="flex items-center gap-4 xl:w-[35%] md:w-[50%] w-full truncate">
+        {/* 1) Cover Image (48px) */}
+        <div className="w-[48px] h-[48px] flex-shrink-0">
           {loading ? (
             <div className="loader" />
+          ) : cover ? (
+            <Image
+              src={cover}
+              alt={title}
+              width={48}
+              height={48}
+              className="rounded-sm"
+            />
           ) : (
-            <div>
-              {cover ? (
-                <Image
-                  src={cover}
-                  alt={title}
-                  width={56}
-                  height={56}
-                  className="rounded-[8px]"
-                />
-              ) : (
-                <Image
-                  src="/images/Playlist.svg"
-                  alt="Song Cover"
-                  width={48}
-                  height={48}
-                  className="rounded-md"
-                />
-              )}
-            </div>
+            <Image
+              src="/images/Playlist.svg"
+              alt="Song Cover"
+              width={48}
+              height={48}
+              className="rounded-md"
+            />
           )}
-          <div className="flex flex-col leading-[24px] overflow-hidden">
-            <span
-              className={`font-semibold overflow-hidden text-ellipsis ${
-                isCurrentSong ? "text-[#00FFB8]" : "text-white"
-              }`}
-            >
-              {title}
-            </span>
-            <span
-              className={`text-[16px] overflow-hidden text-ellipsis ${
-                isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
-              }`}
-            >
-              {artist}
-            </span>
-          </div>
         </div>
+
+        {/* 2) Title & Artist (1fr) */}
+        <div className="truncate leading-5">
+          <span
+            className={`block font-semibold overflow-hidden text-ellipsis ${
+              isCurrentSong ? "text-[#00FFB8]" : "text-white"
+            }`}
+          >
+            {title}
+          </span>
+          <span
+            className={`block text-[14px] overflow-hidden text-ellipsis ${
+              isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
+            }`}
+          >
+            {artist}
+          </span>
+        </div>
+
+        {/* 3) Album (1fr) */}
         <span
-          className={`${
+          className={`truncate ${
             isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
-          } xl:w-[35%] w-[50%] truncate whitespace-nowrap overflow-hidden text-ellipsis hidden md:flex`}
+          }`}
         >
           {album}
         </span>
+
+        {/* 4) Date (1fr) */}
         <span
-          className={`${
+          className={`truncate ${
             isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
-          } xl:w-[20%] hidden xl:block`}
+          }`}
         >
           {date}
         </span>
-        <div className="flex items-center gap-4 relative xl:w-[10%] justify-end pr-[16px]">
+
+        {/* 5) Duration & Plus Icon (72px) */}
+        <div className="flex items-center justify-end gap-2">
           {isCurrentSong && isPlaying ? (
             <div className="equalizer w-[24px] h-[24px]">
               <span></span>
@@ -163,14 +176,17 @@ export default function LongSongCard({
             <span
               className={`${
                 isCurrentSong ? "text-[#22aa84]" : "text-white"
-              } text-nowrap`}
+              } text-sm`}
             >
               {duration}
             </span>
           )}
+
+          {/* Hover Plus Icon */}
           {isHovered && (
             <div
-              className="absolute top-1/2 right-[10px] transform -translate-y-1/2 flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
+              className="flex items-center justify-center w-[36px] h-[36px] 
+                         rounded-full hover:bg-[#5e5c6b] transition cursor-pointer z-10"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowModal(true);
@@ -190,6 +206,63 @@ export default function LongSongCard({
         </div>
       </div>
 
+      {/* Mobile Layout (flex-based) */}
+      <div
+        onClick={handleCardClick}
+        className={`
+          md:hidden 
+          flex items-center gap-4 
+          w-full h-[64px] 
+          px-4 py-2 
+          rounded-md
+          cursor-pointer
+          ${
+            isCurrentSong
+              ? "bg-green-800/20 border-l-4 border-green-400"
+              : "bg-transparent"
+          }
+        `}
+      >
+        <div className="w-[48px] h-[48px] flex-shrink-0">
+          {loading ? (
+            <div className="loader" />
+          ) : cover ? (
+            <Image
+              src={cover}
+              alt={title}
+              width={48}
+              height={48}
+              className="rounded-sm"
+            />
+          ) : (
+            <Image
+              src="/images/Playlist.svg"
+              alt="Song Cover"
+              width={48}
+              height={48}
+              className="rounded-md"
+            />
+          )}
+        </div>
+        <div className="flex flex-col truncate leading-5">
+          <span
+            className={`font-semibold overflow-hidden text-ellipsis ${
+              isCurrentSong ? "text-[#00FFB8]" : "text-white"
+            }`}
+          >
+            {title}
+          </span>
+          <span
+            className={`text-sm overflow-hidden text-ellipsis ${
+              isCurrentSong ? "text-[#22aa84]" : "text-[#ABAAB8]"
+            }`}
+          >
+            {artist}
+          </span>
+        </div>
+      </div>
+
+      {/* Add To Playlist Modal */}
       {showModal && (
         <AddToPlaylistModal
           playlists={playlists}
@@ -230,6 +303,6 @@ export default function LongSongCard({
           closeModal={() => setShowModal(false)}
         />
       )}
-    </div>
+    </>
   );
 }

@@ -77,39 +77,38 @@ const Liked = () => {
         />
 
         <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
-          <div className="flex flex-col gap-1">
-            <div className="flex px-[16px]">
-              <h1 className="text-nit xl:w-[35%] md:w-[50%] w-full">Tracks</h1>
-              <h1 className="text-nit xl:w-[35%] md:w-[50%] hidden md:flex">
-                Album
-              </h1>
-              <h1 className="text-nit xl:w-[20%] xl:block hidden">
-                Date Added
-              </h1>
-              <h1 className="text-nit text-end xl:w-[10%]">Duration</h1>
-            </div>
-            <div className="w-full h-[1px] bg-[#2e2e2e]" />
+          <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
+            <span className="w-[48px] h-[48px]" />
+            <span className="text-nit font-semibold">Title</span>
+            <span className="text-nit font-semibold">Album</span>
+            <span className="text-nit font-semibold">Date added</span>
+            <span className="text-nit font-semibold text-right">Duration</span>
           </div>
 
-          {loading ? (
-            <p className="text-white">Loading liked songs...</p>
-          ) : amount === 0 ? (
-            <p className="text-[#ABAABB] text-lg text-center mt-[40px]">
-              No liked songs found.
-            </p>
-          ) : (
-            likedSongs.map((song) => (
-              <LongSongCard
-                key={song.id}
-                title={song.title}
-                artist={song.artist}
-                album={song.album || "Album"}
-                date={formatDate(song.added_at)}
-                duration={formatDuration(song.duration)}
-                cover={song.cover}
-              />
-            ))
-          )}
+          {/* Divider */}
+          <div className="hidden md:block w-full h-[1px] bg-[#2e2e2e]" />
+
+          <div>
+            {loading ? (
+              <p className="text-white">Loading liked songs...</p>
+            ) : amount === 0 ? (
+              <p className="text-[#ABAABB] text-lg text-center mt-[40px]">
+                No liked songs found.
+              </p>
+            ) : (
+              likedSongs.map((song) => (
+                <LongSongCard
+                  key={song.id}
+                  title={song.title}
+                  artist={song.artist}
+                  album={song.album || "Album"}
+                  date={formatDate(song.added_at)}
+                  duration={formatDuration(song.duration)}
+                  cover={song.cover}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
 
