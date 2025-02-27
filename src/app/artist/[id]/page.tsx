@@ -5,7 +5,7 @@ import {
   getArtistAlbums,
 } from "@/lib/spotify";
 import LongSongCard from "@/components/LongSongCard";
-import AlbumCard from "@/components/AlbumCard";
+import AlbumCarousel from "@/components/AlbumCarousel";
 
 interface ArtistPageProps {
   params: Promise<{ id: string }>;
@@ -109,19 +109,9 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
           <div className="mt-8">
             {/* SHOW ALBUMS */}
-            <h2 className="text-2xl font-bold mb-4">Albums</h2>
-            <div className="flex overflow-auto">
-              {albums &&
-                albums.map((album) => (
-                  <div key={album.id} className="flex-shrink-0 ">
-                    <AlbumCard
-                      albumCover={album.images?.[0]?.url}
-                      albumTitle={album.name}
-                      artistName={artist.name}
-                      id={album.id}
-                    />
-                  </div>
-                ))}
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold">Albums</h2>
+              <AlbumCarousel albums={albums} artistName={artist.name} />
             </div>
           </div>
         </div>

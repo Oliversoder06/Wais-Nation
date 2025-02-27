@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.10.6",
+    "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.48.1",
     "dotenv": "^16.4.7",
     "framer-motion": "^12.0.6",
