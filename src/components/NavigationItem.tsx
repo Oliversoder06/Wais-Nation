@@ -8,16 +8,20 @@ const NavigationItem = ({
   icon,
   anchor,
   alt,
+  label,
+  isExpanded,
 }: {
   icon: string;
   alt: string;
   anchor?: string;
+  label: string;
+  isExpanded: boolean;
 }) => {
   const pathname = usePathname();
   const isActive = pathname === anchor;
 
   return (
-    <Link href={anchor || "#"}>
+    <Link className="flex items-center" href={anchor || "#"}>
       <div className="relative flex justify-center items-center w-[84px]">
         {/* Left Indicator (Only visible when active) */}
         {isActive && (
@@ -43,6 +47,17 @@ const NavigationItem = ({
           <Image src={icon} alt={`${alt} icon`} width={28} height={28} />
         </motion.div>
       </div>
+      <span
+        className={`absolute left-[100px] select-none text-xs  px-2 py-1 rounded-full transition-all duration-300 ${
+          isExpanded
+            ? isActive
+              ? "text-primary font-bold"
+              : "text-white opacity-80"
+            : "hidden"
+        }`}
+      >
+        {label}
+      </span>
     </Link>
   );
 };
