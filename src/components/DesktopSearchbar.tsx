@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { searchSpotify } from "@/lib/spotify"; // existing track search
 import { getSpotifyToken } from "@/lib/spotify";
 
@@ -75,33 +76,77 @@ const DesktopSearchbar: React.FC = () => {
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
   const [trackResults, setTrackResults] = useState<Track[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
+  // selectedIndex is a combined index for artists then tracks
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const searchRef = useRef<HTMLDivElement>(null);
+  // Create refs for each result item
+  const resultsRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const router = useRouter();
+
+  // Total count for arrow navigation
+  const totalResults = artistResults.length + trackResults.length;
+
+  // Handle arrow keys and Enter on the input
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, totalResults - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      if (selectedIndex !== -1) {
+        // Determine if the selected index is an artist or a track
+        if (selectedIndex < artistResults.length) {
+          const selectedArtist = artistResults[selectedIndex];
+          router.push(`/artist/${selectedArtist.id}`);
+        } else {
+          const trackIndex = selectedIndex - artistResults.length;
+          const selectedTrack = trackResults[trackIndex];
+          router.push(`/track/${selectedTrack.id}`);
+        }
+        setShowResults(false);
+        setQuery("");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (selectedIndex !== -1 && resultsRefs.current[selectedIndex]) {
+      resultsRefs.current[selectedIndex]?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [selectedIndex]);
 
   useEffect(() => {
     if (query.length > 2) {
       const debounceTimeout = setTimeout(() => {
         (async () => {
           try {
-            // Run both searches concurrently: top 2 artists and up to 10 tracks
+            // Run both searches concurrently: top 2 artists and up to 15 tracks
             const [artistData, trackData] = await Promise.all([
               searchArtists({ query, limit: 2 }),
-              searchSpotify({ query, limit: 10 }) as Promise<TrackSearchResult>,
+              searchSpotify({ query, limit: 15 }) as Promise<TrackSearchResult>,
             ]);
             setArtistResults(artistData ? artistData.artists.items : []);
             setTrackResults(trackData ? trackData.tracks.items : []);
             setShowResults(true);
+            setSelectedIndex(-1);
           } catch (error) {
             toast.error("Error during Spotify search");
             console.error("Error during Spotify search:", error);
           }
         })();
-      }, 300);
+      }, 200);
 
       return () => clearTimeout(debounceTimeout);
     } else {
       setArtistResults([]);
       setTrackResults([]);
       setShowResults(false);
+      setSelectedIndex(-1);
     }
   }, [query]);
 
@@ -121,6 +166,8 @@ const DesktopSearchbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  let globalIndex = 0;
+
   return (
     <div className="fixed top-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-50">
       <div ref={searchRef} className="relative hidden md:flex">
@@ -131,6 +178,7 @@ const DesktopSearchbar: React.FC = () => {
           placeholder="Search for tracks and artists..."
           className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
           onFocus={() => setShowResults(true)}
+          onKeyDown={handleKeyDown}
         />
         <Image
           src="/icons/searchicon.svg"
@@ -145,70 +193,88 @@ const DesktopSearchbar: React.FC = () => {
               {/* Top 2 Artists Section */}
               {artistResults.length > 0 && (
                 <div className="border-b border-container pb-2">
-                  {artistResults.map((artist) => (
-                    <Link
-                      href={`/artist/${artist.id}`}
-                      key={artist.id}
-                      passHref
-                    >
-                      <div
-                        className="p-2 hover:bg-container cursor-pointer flex items-center gap-2"
-                        onClick={() => {
-                          setQuery("");
-                          setShowResults(false);
-                        }}
+                  {artistResults.map((artist) => {
+                    const currentIndex = globalIndex;
+                    globalIndex++;
+                    return (
+                      <Link
+                        href={`/artist/${artist.id}`}
+                        key={artist.id}
+                        passHref
                       >
-                        {artist.images && artist.images[0] && (
-                          <Image
-                            src={artist.images[0].url}
-                            alt={artist.name}
-                            width={40}
-                            height={40}
-                            className="rounded-full"
-                          />
-                        )}
-                        <div>
-                          <p className="font-semibold text-white">
-                            {artist.name}
-                          </p>
+                        <div
+                          ref={(el) => {
+                            resultsRefs.current[currentIndex] = el;
+                          }}
+                          className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
+                            selectedIndex === currentIndex ? "bg-container" : ""
+                          }`}
+                          onClick={() => {
+                            setQuery("");
+                            setShowResults(false);
+                          }}
+                        >
+                          {artist.images && artist.images[0] && (
+                            <Image
+                              src={artist.images[0].url}
+                              alt={artist.name}
+                              width={40}
+                              height={40}
+                              className="rounded-full"
+                            />
+                          )}
+                          <div>
+                            <p className="font-semibold text-white">
+                              {artist.name}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
               {/* Track Results Section */}
               {trackResults.length > 0 && (
                 <div className="pt-2">
-                  {trackResults.map((track) => (
-                    <Link href={`/track/${track.id}`} key={track.id} passHref>
-                      <div
-                        className="p-2 hover:bg-container cursor-pointer flex items-center gap-2"
-                        onClick={() => {
-                          setQuery("");
-                          setShowResults(false);
-                        }}
-                      >
-                        <Image
-                          src={track.album.images[0].url}
-                          alt="album cover"
-                          width={40}
-                          height={40}
-                          className="rounded"
-                        />
-                        <div>
-                          <p className="font-semibold text-white">
-                            {track.name}
-                          </p>
-                          <p className="text-sm text-nit">
-                            {track.artists
-                              .map((artist) => artist.name)
-                              .join(", ")}
-                          </p>
+                  {trackResults.map((track) => {
+                    const currentIndex = globalIndex;
+                    globalIndex++;
+                    return (
+                      <Link href={`/track/${track.id}`} key={track.id} passHref>
+                        <div
+                          ref={(el) => {
+                            resultsRefs.current[currentIndex] = el;
+                          }}
+                          className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
+                            selectedIndex === currentIndex ? "bg-container" : ""
+                          }`}
+                          onClick={() => {
+                            setQuery("");
+                            setShowResults(false);
+                          }}
+                        >
+                          <Image
+                            src={track.album.images[0].url}
+                            alt="album cover"
+                            width={40}
+                            height={40}
+                            className="rounded"
+                          />
+                          <div>
+                            <p className="font-semibold text-white">
+                              {track.name}
+                            </p>
+                            <p className="text-sm text-nit">
+                              {track.artists
+                                .map((artist) => artist.name)
+                                .join(", ")}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
