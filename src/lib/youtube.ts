@@ -32,7 +32,7 @@ export async function searchYouTube(query: string): Promise<{
   title: string;
 } | null> {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL2; // e.g., "https://waisnation-backend.onrender.com"
+    const API_URL = process.env.NEXT_PUBLIC_API_URL; // e.g., "https://waisnation-backend.onrender.com"
     const response = await fetch(
       `${API_URL}/search?query=${encodeURIComponent(query)}`
     );
