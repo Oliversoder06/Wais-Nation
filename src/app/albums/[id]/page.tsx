@@ -51,12 +51,15 @@ export default async function AlbumPage({ params }: AlbumPageProps) {
 
       {/* Tracks List */}
       <div className="p-8 flex flex-col gap-4">
-        <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 text-gray-400 border-b border-gray-700">
-          <span className="w-[48px] h-[48px]" />
-          <span className="text-nit font-semibold">Title</span>
-          <span className="text-nit font-semibold">Album</span>
-          <span className="text-nit font-semibold">Released</span>
-          <span className="text-nit font-semibold text-right">Duration</span>
+        <div className="flex flex-col gap-1">
+          <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
+            <span className="w-[48px] h-[48px]" />
+            <span className="text-nit font-semibold">Title</span>
+            <span className="text-nit font-semibold">Album</span>
+            <span className="text-nit font-semibold">Released</span>
+            <span className="text-nit font-semibold text-right">Duration</span>
+          </div>
+          <div className="w-full h-[1px] bg-[#2e2e2e]" />
         </div>
         <div className="flex flex-col">
           {album.tracks.items.map((track) => (

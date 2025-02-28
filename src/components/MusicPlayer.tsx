@@ -143,6 +143,15 @@ const MusicPlayer: React.FC = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   }
 
+  const handleVideoEnd = () => {
+    if (queue.length > 0) {
+      playNext();
+    } else if (currentTrack) {
+      playerRef.current?.seekTo(0, true);
+      playerRef.current?.playVideo();
+    }
+  };
+
   return (
     <div className="h-[100px] bg-background fixed bottom-0 right-0 w-full items-center justify-between px-[40px] md:flex hidden z-10">
       {/* Left Side: Song Info */}
@@ -284,13 +293,12 @@ const MusicPlayer: React.FC = () => {
             }}
             onReady={(event) => {
               playerRef.current = event.target;
-              // Immediately set the volume on the new player
               event.target.setVolume(volume);
               console.log("YouTube Player Ready! Volume set to", volume);
               event.target.playVideo();
             }}
             onStateChange={onPlayerStateChange}
-            onEnd={playNext}
+            onEnd={handleVideoEnd}
           />
         </div>
       )}
