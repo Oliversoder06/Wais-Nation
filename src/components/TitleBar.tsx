@@ -2,7 +2,6 @@
 "use client";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import path from "path";
 import React, { useEffect, useState } from "react";
 import { MdClose, MdMinimize, MdFullscreen } from "react-icons/md";
 

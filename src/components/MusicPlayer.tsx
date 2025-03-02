@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import YouTube from "react-youtube";
 import { useMusicStore } from "@/store/musicStore";
 import VolumeControl from "./VolumeControl";
@@ -29,7 +29,19 @@ const MusicPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // When currentTrack changes, fetch Spotify data
+  // Define handlePlayPause with useCallback so it's defined before being used in useEffect
+  const handlePlayPause = useCallback(() => {
+    if (!playerRef.current) return;
+    console.log("[MusicPlayer] Toggling play/pause. isPlaying:", isPlaying);
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
+    togglePlay();
+  }, [isPlaying, togglePlay]);
+
+  // When currentTrack changes, fetch Spotify data.
   useEffect(() => {
     if (!currentTrack) {
       console.log("[MusicPlayer] currentTrack is null");
@@ -53,28 +65,27 @@ const MusicPlayer: React.FC = () => {
     fetchSpotifyId();
   }, [currentTrack]);
 
-  // When currentTrack changes, load the video and update mini player via IPC.
+  // When currentTrack changes, load the new video and update the mini player via IPC.
   useEffect(() => {
     if (!currentTrack) return;
-    // Ensure playerRef.current exists
     if (!playerRef.current) {
       console.log("[MusicPlayer] Player not ready yet, delaying loadVideoById");
       return;
     }
     console.log("[MusicPlayer] Loading video with id:", currentTrack.videoId);
     playerRef.current.loadVideoById(currentTrack.videoId);
-
     if (window.myElectron && window.myElectron.updateTrack) {
       console.log("[MusicPlayer] Sending updateTrack IPC with", currentTrack);
       window.myElectron.updateTrack(currentTrack);
     }
   }, [currentTrack]);
 
+  // Debounce reloading video when currentTrack changes (optional).
   useEffect(() => {
     const debounceTimeout = setTimeout(() => {
       if (currentTrack && playerRef.current) {
         console.log(
-          "[MusicPlayer] Loading video with id:",
+          "[MusicPlayer] Debounced loading video with id:",
           currentTrack.videoId
         );
         playerRef.current.loadVideoById(currentTrack.videoId);
@@ -82,25 +93,26 @@ const MusicPlayer: React.FC = () => {
           window.myElectron.updateTrack(currentTrack);
         }
       }
-    }, 300); // 300ms debounce delay
-
+    }, 300);
     return () => clearTimeout(debounceTimeout);
   }, [currentTrack]);
 
-  // Cleanup interval on unmount
+  // Cleanup interval on unmount.
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
 
+  // Set up Electron IPC listeners.
   useEffect(() => {
     if (window.myElectron) {
       window.myElectron.on("toggle-play", () => {
         console.log("[MusicPlayer] Received toggle-play IPC");
         handlePlayPause();
       });
-      window.myElectron.on("set-volume", (newVolume: number) => {
+      window.myElectron.on("set-volume", (data: unknown) => {
+        const newVolume = data as number;
         console.log("[MusicPlayer] Received set-volume IPC with", newVolume);
         if (playerRef.current) {
           playerRef.current.setVolume(newVolume);
@@ -108,24 +120,13 @@ const MusicPlayer: React.FC = () => {
         }
       });
     }
-  }, [isPlaying, currentTrack, volume]);
+  }, [handlePlayPause, isPlaying, currentTrack, volume]);
 
-  const handlePlayPause = () => {
-    if (!playerRef.current) return;
-    console.log("[MusicPlayer] Toggling play/pause. isPlaying:", isPlaying);
-    if (isPlaying) {
-      playerRef.current.pauseVideo();
-    } else {
-      playerRef.current.playVideo();
-    }
-    togglePlay();
-  };
-
-  function formatDuration(seconds: number): string {
+  const formatDuration = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  }
+  };
 
   const onPlayerStateChange = (event: { data: number }) => {
     if (event.data === 1) {

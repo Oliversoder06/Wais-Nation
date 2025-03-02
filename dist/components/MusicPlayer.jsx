@@ -93,6 +93,18 @@ const MusicPlayer = () => {
             window.myElectron.updateTrack(currentTrack);
         }
     }, [currentTrack]);
+    (0, react_1.useEffect)(() => {
+        const debounceTimeout = setTimeout(() => {
+            if (currentTrack && playerRef.current) {
+                console.log("[MusicPlayer] Loading video with id:", currentTrack.videoId);
+                playerRef.current.loadVideoById(currentTrack.videoId);
+                if (window.myElectron && window.myElectron.updateTrack) {
+                    window.myElectron.updateTrack(currentTrack);
+                }
+            }
+        }, 300); // 300ms debounce delay
+        return () => clearTimeout(debounceTimeout);
+    }, [currentTrack]);
     // Cleanup interval on unmount
     (0, react_1.useEffect)(() => {
         return () => {

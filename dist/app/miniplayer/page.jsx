@@ -39,7 +39,7 @@ const MiniPlayer = () => {
         }
         setIsPlaying(!isPlaying);
     };
-    return (<div className="w-full h-[85vh] bg-[#181818] text-white flex flex-col items-center justify-center rounded-lg shadow-lg p-4">
+    return (<div className="w-full h-[100vh] pb-[75px] bg-[#181818] text-white flex flex-col items-center justify-center rounded-lg shadow-lg p-4">
       {track ? (<>
           <div className="flex items-center gap-4">
             <image_1.default src={`https://i.ytimg.com/vi/${track.videoId}/hqdefault.jpg`} alt="Thumbnail" width={60} height={60} className="rounded-lg"/>

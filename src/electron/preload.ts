@@ -10,8 +10,8 @@ interface MyElectronAPI {
   openMiniPlayer(track: Track): void;
   updateTrack(track: Track): void;
   onUpdateTrack(callback: (track: Track) => void): void;
-  on(channel: string, callback: (data: any) => void): void;
-  send(channel: string, data?: any): void;
+  on(channel: string, callback: (data: unknown) => void): void;
+  send(channel: string, data?: unknown): void;
   closeWindow(): void;
   minimizeWindow(): void;
   toggleMaximizeWindow(): void;
@@ -39,7 +39,7 @@ const api: MyElectronAPI = {
   },
 
   on(channel, callback) {
-    ipcRenderer.on(channel, (event: IpcRendererEvent, data: any) => {
+    ipcRenderer.on(channel, (event: IpcRendererEvent, data: unknown) => {
       console.log("[Preload] on channel", channel, "received data:", data);
       callback(data);
     });

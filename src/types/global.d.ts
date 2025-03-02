@@ -11,8 +11,8 @@ declare global {
     openMiniPlayer(track: Track): void;
     updateTrack(track: Track): void;
     onUpdateTrack(callback: (track: Track) => void): void;
-    on(channel: string, callback: (data: any) => void): void;
-    send(channel: string, data?: any): void;
+    on(channel: string, callback: (data: unknown) => void): void;
+    send(channel: string, data?: unknown): void;
     closeWindow(): void;
     minimizeWindow(): void;
     toggleMaximizeWindow(): void;
