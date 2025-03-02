@@ -1,0 +1,231 @@
+"use strict";
+"use client";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const react_1 = __importStar(require("react"));
+const image_1 = __importDefault(require("next/image"));
+const link_1 = __importDefault(require("next/link"));
+const react_hot_toast_1 = __importDefault(require("react-hot-toast"));
+const navigation_1 = require("next/navigation");
+const spotify_1 = require("@/lib/spotify");
+const spotify_2 = require("@/lib/spotify");
+// New function to search for artists
+async function searchArtists({ query, limit, }) {
+    try {
+        const token = await (0, spotify_2.getSpotifyToken)();
+        const response = await fetch(`https://api.spotify.com/v1/search?offset=0&limit=${limit}&q=${encodeURIComponent(query)}&type=artist`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to search artists: ${errorText}`);
+        }
+        const data = await response.json();
+        return data;
+    }
+    catch (error) {
+        console.error("Error searching artists:", error);
+        return null;
+    }
+}
+const DesktopSearchbar = () => {
+    const [query, setQuery] = (0, react_1.useState)("");
+    const [artistResults, setArtistResults] = (0, react_1.useState)([]);
+    const [trackResults, setTrackResults] = (0, react_1.useState)([]);
+    const [showResults, setShowResults] = (0, react_1.useState)(false);
+    // selectedIndex is a combined index for artists then tracks
+    const [selectedIndex, setSelectedIndex] = (0, react_1.useState)(-1);
+    const [isElectron, setIsElectron] = (0, react_1.useState)(false);
+    const searchRef = (0, react_1.useRef)(null);
+    // Create refs for each result item
+    const resultsRefs = (0, react_1.useRef)([]);
+    const router = (0, navigation_1.useRouter)();
+    // Total count for arrow navigation
+    const totalResults = artistResults.length + trackResults.length;
+    // Check if running in Electron
+    (0, react_1.useEffect)(() => {
+        if (typeof window !== "undefined" && window.myElectron) {
+            setIsElectron(true);
+        }
+    }, []);
+    // Handle arrow keys and Enter on the input
+    const handleKeyDown = (e) => {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            setSelectedIndex((prev) => Math.min(prev + 1, totalResults - 1));
+        }
+        else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setSelectedIndex((prev) => Math.max(prev - 1, 0));
+        }
+        else if (e.key === "Enter") {
+            if (selectedIndex !== -1) {
+                // Determine if the selected index is an artist or a track
+                if (selectedIndex < artistResults.length) {
+                    const selectedArtist = artistResults[selectedIndex];
+                    router.push(`/artist/${selectedArtist.id}`);
+                }
+                else {
+                    const trackIndex = selectedIndex - artistResults.length;
+                    const selectedTrack = trackResults[trackIndex];
+                    router.push(`/track/${selectedTrack.id}`);
+                }
+                setShowResults(false);
+                setQuery("");
+            }
+        }
+    };
+    (0, react_1.useEffect)(() => {
+        var _a;
+        if (selectedIndex !== -1 && resultsRefs.current[selectedIndex]) {
+            (_a = resultsRefs.current[selectedIndex]) === null || _a === void 0 ? void 0 : _a.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+            });
+        }
+    }, [selectedIndex]);
+    (0, react_1.useEffect)(() => {
+        if (query.length > 2) {
+            const debounceTimeout = setTimeout(() => {
+                (async () => {
+                    try {
+                        // Run both searches concurrently: top 2 artists and up to 15 tracks
+                        const [artistData, trackData] = await Promise.all([
+                            searchArtists({ query, limit: 2 }),
+                            (0, spotify_1.searchSpotify)({ query, limit: 15 }),
+                        ]);
+                        setArtistResults(artistData ? artistData.artists.items : []);
+                        setTrackResults(trackData ? trackData.tracks.items : []);
+                        setShowResults(true);
+                        setSelectedIndex(-1);
+                    }
+                    catch (error) {
+                        react_hot_toast_1.default.error("Error during Spotify search");
+                        console.error("Error during Spotify search:", error);
+                    }
+                })();
+            }, 200);
+            return () => clearTimeout(debounceTimeout);
+        }
+        else {
+            setArtistResults([]);
+            setTrackResults([]);
+            setShowResults(false);
+            setSelectedIndex(-1);
+        }
+    }, [query]);
+    (0, react_1.useEffect)(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current &&
+                !searchRef.current.contains(event.target)) {
+                setShowResults(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside, {
+            passive: true,
+        });
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+    let globalIndex = 0;
+    // Set top position: if Electron, top-[48px], else top-0.
+    const topClass = isElectron ? "top-[48px]" : "top-0";
+    return (<div className={`fixed ${topClass} left-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-[1000]`}>
+      <div ref={searchRef} className="relative hidden md:flex">
+        <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search for tracks and artists..." className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none" onFocus={() => setShowResults(true)} onKeyDown={handleKeyDown}/>
+        <image_1.default src="/icons/searchicon.svg" alt="search" width={20} height={20} className="absolute top-[50%] left-[12px] transform -translate-y-1/2"/>
+        {showResults &&
+            (artistResults.length > 0 || trackResults.length > 0) && (<div className="absolute top-full left-0 right-0 bg-background shadow-lg rounded mt-2 max-h-96 overflow-y-auto scrollbar z-[1000]">
+              {/* Top 2 Artists Section */}
+              {artistResults.length > 0 && (<div className="border-b border-container pb-2">
+                  {artistResults.map((artist) => {
+                    const currentIndex = globalIndex;
+                    globalIndex++;
+                    return (<link_1.default href={`/artist/${artist.id}`} key={artist.id} passHref>
+                        <div ref={(el) => {
+                            resultsRefs.current[currentIndex] = el;
+                        }} className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${selectedIndex === currentIndex ? "bg-container" : ""}`} onClick={() => {
+                            setQuery("");
+                            setShowResults(false);
+                        }}>
+                          {artist.images && artist.images[0] && (<image_1.default src={artist.images[0].url} alt={artist.name} width={40} height={40} className="rounded-full"/>)}
+                          <div>
+                            <p className="font-semibold text-white">
+                              {artist.name}
+                            </p>
+                          </div>
+                        </div>
+                      </link_1.default>);
+                })}
+                </div>)}
+              {/* Track Results Section */}
+              {trackResults.length > 0 && (<div className="pt-2">
+                  {trackResults.map((track) => {
+                    var _a, _b;
+                    const currentIndex = globalIndex;
+                    globalIndex++;
+                    return (<link_1.default href={`/track/${track.id}`} key={track.id} passHref>
+                        <div ref={(el) => {
+                            resultsRefs.current[currentIndex] = el;
+                        }} className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${selectedIndex === currentIndex ? "bg-container" : ""}`} onClick={() => {
+                            setQuery("");
+                            setShowResults(false);
+                        }}>
+                          <image_1.default src={((_b = (_a = track.album.images) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.url) ||
+                            "/images/Playlist.svg"} alt="album cover" width={40} height={40} className="rounded"/>
+                          <div>
+                            <p className="font-semibold text-white">
+                              {track.name}
+                            </p>
+                            <p className="text-sm text-nit">
+                              {track.artists
+                            .map((artist) => artist.name)
+                            .join(", ")}
+                            </p>
+                          </div>
+                        </div>
+                      </link_1.default>);
+                })}
+                </div>)}
+            </div>)}
+      </div>
+    </div>);
+};
+exports.default = DesktopSearchbar;

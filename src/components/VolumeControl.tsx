@@ -84,8 +84,8 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
             : "/icons/volumedown.svg"
         }
         alt="volume"
-        width={32}
-        height={32}
+        width={24}
+        height={24}
         className="cursor-pointer hover:opacity-80"
         onClick={toggleMute}
       />
@@ -97,7 +97,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
             max="100"
             value={volume}
             onChange={handleVolumeChange}
-            className="volume-slider"
+            className="volume-slider y-2 bg-background flex items-center justify-center"
             style={{ "--progress": `${volume}%` } as React.CSSProperties}
           />
         </div>

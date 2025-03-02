@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { searchSpotify } from "@/lib/spotify"; // existing track search
+import { searchSpotify } from "@/lib/spotify";
 import { getSpotifyToken } from "@/lib/spotify";
 
 // Define interfaces for Artists and Tracks
@@ -78,6 +78,7 @@ const DesktopSearchbar: React.FC = () => {
   const [showResults, setShowResults] = useState<boolean>(false);
   // selectedIndex is a combined index for artists then tracks
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [isElectron, setIsElectron] = useState<boolean>(false);
   const searchRef = useRef<HTMLDivElement>(null);
   // Create refs for each result item
   const resultsRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -85,6 +86,13 @@ const DesktopSearchbar: React.FC = () => {
 
   // Total count for arrow navigation
   const totalResults = artistResults.length + trackResults.length;
+
+  // Check if running in Electron
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.myElectron) {
+      setIsElectron(true);
+    }
+  }, []);
 
   // Handle arrow keys and Enter on the input
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -168,8 +176,13 @@ const DesktopSearchbar: React.FC = () => {
 
   let globalIndex = 0;
 
+  // Set top position: if Electron, top-[48px], else top-0.
+  const topClass = isElectron ? "top-[48px]" : "top-0";
+
   return (
-    <div className="fixed top-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-50">
+    <div
+      className={`fixed ${topClass} left-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-[1000]`}
+    >
       <div ref={searchRef} className="relative hidden md:flex">
         <input
           type="text"
@@ -264,7 +277,6 @@ const DesktopSearchbar: React.FC = () => {
                             height={40}
                             className="rounded"
                           />
-
                           <div>
                             <p className="font-semibold text-white">
                               {track.name}

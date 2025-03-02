@@ -83,7 +83,10 @@ input[type="checkbox"]:checked + .custom-check {
   transition: background 0.3s;
   cursor: pointer;
   position: relative;
-  border: #0d0d0d 5px solid;
+  border-left: #0d0d0d 5px solid;
+  border-right: #0d0d0d 5px solid;
+  border-bottom: #0d0d0d 10px solid;
+  border-top: #0d0d0d 10px solid;
 }
 
 /* Track styling */
@@ -183,4 +186,12 @@ input[type="checkbox"]:checked + .custom-check {
   100% {
     transform: scaleY(0.3);
   }
+}
+
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
 }

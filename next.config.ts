@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
@@ -25,4 +31,4 @@ export default withPWA({
   dest: "public",
   register: true,
   skipWaiting: true,
-})(nextConfig);
+})(nextConfig as any);

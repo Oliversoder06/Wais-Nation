@@ -1,14 +1,18 @@
+// RootLayout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import Sideplayer from "@/components/Sideplayer";
 import DesktopSearchbar from "@/components/DesktopSearchbar";
 import MusicPlayer from "@/components/MusicPlayer";
+import MainContainer from "@/components/MainContainer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import MobileNav from "@/components/MobileNav";
 import { PlayerProvider } from "@/components/PlayerContext";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import TitleBar from "@/components/TitleBar";
+import MarginPlaceholder from "@/components/MarginPlaceholder";
 
 export const metadata: Metadata = {
   title: "Wais Nation",
@@ -24,65 +28,38 @@ export default function RootLayout({
     <ClerkProvider>
       <PlayerProvider>
         <html lang="en">
-          <head>
-            {/* Web Manifest (for Android & Desktop PWAs) */}
-            <link rel="manifest" href="/manifest.json" />
-
-            {/* iOS PWA Meta Tags */}
-            <meta name="apple-mobile-web-app-capable" content="yes" />
-            <meta
-              name="apple-mobile-web-app-status-bar-style"
-              content="default"
-            />
-            <meta name="apple-mobile-web-app-title" content="My PWA App" />
-
-            {/* iOS Icons */}
-            <link
-              rel="apple-touch-icon"
-              sizes="180x180"
-              href="/images/logo180.png"
-            />
-            <link
-              rel="apple-touch-icon"
-              sizes="152x152"
-              href="/images/logo152.png"
-            />
-            <link
-              rel="apple-touch-icon"
-              sizes="167x167"
-              href="/images/logo167.png"
-            />
-          </head>
-          <body className="bg-secondary md:bg-background flex flex-col md:flex-row">
-            <ServiceWorkerRegister />
-
-            {/* Mobile Header/Navigation */}
-            <div className="hidden md:flex">
-              <Sidebar />
+          <head>{/* Manifest and meta tags here */}</head>
+          <body className="overflow-hidden">
+            <div className="fixed top-0 left-0 w-full z-[90] ">
+              <TitleBar />
             </div>
-            <div className="md:hidden">
-              <MobileNav />
-            </div>
+            <MarginPlaceholder />
+            <div className="bg-secondary md:bg-background flex flex-col md:flex-row relative">
+              <ServiceWorkerRegister />
 
-            <nav>
-              <DesktopSearchbar />
-            </nav>
-
-            {/* Main Content Area */}
-            <main className="md:ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] h-[calc(100vh-25px)] md:pt-[64px] md:px-[8px] pb-[75px]">
-              <div className="md:bg-secondary rounded-lg h-full w-full md:overflow-y-auto scrollbar">
-                {children}
+              {/* Mobile Header/Navigation */}
+              <div className="hidden md:flex">
+                <Sidebar />
               </div>
-            </main>
+              <div className="md:hidden">
+                <MobileNav />
+              </div>
 
-            {/* Sideplayer Area */}
-            <div className="overflow-y-auto overscroll-contain">
-              <Sideplayer />
+              <nav className="">
+                <DesktopSearchbar />
+              </nav>
+
+              {/* Wrap the main content with our client component */}
+              <MainContainer>{children}</MainContainer>
+
+              {/* Sideplayer Area */}
+              <div className="overflow-y-auto overscroll-contain fixed top-10 left-0 w-full z-10">
+                <Sideplayer />
+              </div>
+
+              <MusicPlayer />
+              <Toaster />
             </div>
-
-            <MusicPlayer />
-
-            <Toaster />
           </body>
         </html>
       </PlayerProvider>

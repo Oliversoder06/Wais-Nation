@@ -144,13 +144,13 @@ const Sideplayer = () => {
     : {};
 
   return (
-    <div>
+    <div className=" ">
       <Image
         src="/icons/open-sidebar.svg"
         alt="open sidebar"
         width={40}
         height={40}
-        className="cursor-pointer fixed right-0 top-0 m-[20px] z-[50] hidden md:block xl:hidden"
+        className="cursor-pointer fixed right-0 top-8 m-[20px] z-[50] hidden md:block xl:hidden"
         onClick={handleOpen}
       />
       {/* Mobile/Open Sidebar */}
@@ -162,7 +162,7 @@ const Sideplayer = () => {
               onClick={handleOpen}
             ></div>
             <div
-              className="w-[300px] right-0 h-[calc(100vh-100px)] flex flex-col justify-end p-[20px] gap-[20px] z-[80] fixed rounded-bl-lg"
+              className="w-[300px] right-0 h-[calc(100vh-148px)] flex flex-col justify-end p-[20px] gap-[20px] z-[80] fixed rounded-bl-lg"
               style={containerStyle}
             >
               <div className="absolute inset-0 bg-secondary opacity-[0.90]"></div>
@@ -205,10 +205,10 @@ const Sideplayer = () => {
 
       {/* Desktop Sidebar */}
       <div
-        className="w-[364px] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col justify-end p-[20px] gap-[20px] hidden rounded-bl-lg"
+        className="w-[364px] fixed right-0 h-[calc(100vh-100px)] xl:flex flex-col top-0 justify-end p-[20px] gap-[20px] hidden rounded-l-lg"
         style={containerStyle}
       >
-        <div className="absolute inset-0 bg-secondary opacity-[0.90]"></div>
+        <div className="absolute inset-0 bg-secondary opacity-[0.90] rounded-l-[6px]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex flex-col leading-[32px]">

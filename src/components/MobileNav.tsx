@@ -4,8 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-const MobileNav = () => {
+const MobileNav: React.FC = () => {
   const pathname = usePathname();
+
+  if (pathname === "/miniplayer") return null;
 
   return (
     <div className="bg-secondary h-[100px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">

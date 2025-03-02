@@ -7,19 +7,6 @@ import VolumeControl from "./VolumeControl";
 import Link from "next/link";
 import { searchSpotify } from "@/lib/spotify";
 
-enum YouTubePlayerState {
-  UNSTARTED = -1,
-  ENDED = 0,
-  PLAYING = 1,
-  PAUSED = 2,
-  BUFFERING = 3,
-  CUED = 5,
-}
-
-interface YouTubeOnStateChangeEvent {
-  data: number;
-}
-
 interface ExtendedYTPlayer extends YT.Player {
   getCurrentTime(): number;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
@@ -35,7 +22,6 @@ const MusicPlayer: React.FC = () => {
     queue,
     history,
   } = useMusicStore();
-
   const playerRef = useRef<YT.Player | null>(null);
   const [volume, setVolume] = useState(50);
   const [spotifyTrackId, setSpotifyTrackId] = useState<string | null>(null);
@@ -43,83 +29,112 @@ const MusicPlayer: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // When a new track is loaded, wait for the player to be ready and load the video.
+  // When currentTrack changes, fetch Spotify data
   useEffect(() => {
-    if (!currentTrack) return;
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const loadVideoWhenReady = () => {
-      if (playerRef.current) {
-        const iframe =
-          playerRef.current.getIframe() as unknown as HTMLIFrameElement;
-        if (iframe && iframe.src) {
-          console.log("Loading video:", currentTrack.videoId);
-          playerRef.current.loadVideoById(currentTrack.videoId);
-          return;
-        }
-      }
-      timeoutId = setTimeout(loadVideoWhenReady, 100);
-    };
-    loadVideoWhenReady();
-    return () => clearTimeout(timeoutId);
-  }, [currentTrack]);
-
-  useEffect(() => {
+    if (!currentTrack) {
+      console.log("[MusicPlayer] currentTrack is null");
+      return;
+    }
+    console.log("[MusicPlayer] currentTrack changed:", currentTrack);
     async function fetchSpotifyId() {
-      if (currentTrack) {
-        try {
-          const query = `${currentTrack.title} ${currentTrack.artist}`;
-          const searchResults = await searchSpotify({ query, limit: 1 });
-          if (
-            searchResults &&
-            searchResults.tracks.items &&
-            searchResults.tracks.items.length > 0
-          ) {
-            const spotifyTrack = searchResults.tracks.items[0];
-            setSpotifyTrackId(spotifyTrack.id);
-            if (spotifyTrack.artists && spotifyTrack.artists.length > 0) {
-              setArtistId(spotifyTrack.artists[0].id);
-            } else {
-              setArtistId(null);
-            }
-          } else {
-            setSpotifyTrackId(null);
-            setArtistId(null);
-          }
-        } catch (error) {
-          console.error("Error fetching Spotify track/artist ID:", error);
-          setSpotifyTrackId(null);
-          setArtistId(null);
-        }
+      try {
+        const query = `${currentTrack?.title ?? ""} ${
+          currentTrack?.artist ?? ""
+        }`;
+        const searchResults = await searchSpotify({ query, limit: 1 });
+        if (!searchResults || !searchResults.tracks?.items?.length) return;
+        const track = searchResults.tracks.items[0];
+        setSpotifyTrackId(track.id);
+        setArtistId(track.artists.length > 0 ? track.artists[0].id : null);
+      } catch (error) {
+        console.error("Error fetching Spotify track:", error);
       }
     }
     fetchSpotifyId();
   }, [currentTrack]);
 
-  const handlePlayPause = () => {
-    if (playerRef.current) {
-      if (isPlaying) {
-        playerRef.current.pauseVideo();
-      } else {
-        playerRef.current.playVideo();
-      }
-      togglePlay();
-    }
-  };
-
-  // Reset currentTime when a new track loads
+  // When currentTrack changes, load the video and update mini player via IPC.
   useEffect(() => {
-    setCurrentTime(0);
+    if (!currentTrack) return;
+    // Ensure playerRef.current exists
+    if (!playerRef.current) {
+      console.log("[MusicPlayer] Player not ready yet, delaying loadVideoById");
+      return;
+    }
+    console.log("[MusicPlayer] Loading video with id:", currentTrack.videoId);
+    playerRef.current.loadVideoById(currentTrack.videoId);
+
+    if (window.myElectron && window.myElectron.updateTrack) {
+      console.log("[MusicPlayer] Sending updateTrack IPC with", currentTrack);
+      window.myElectron.updateTrack(currentTrack);
+    }
   }, [currentTrack]);
 
-  const onPlayerStateChange = (event: YouTubeOnStateChangeEvent) => {
-    if (event.data === YouTubePlayerState.PLAYING) {
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      if (currentTrack && playerRef.current) {
+        console.log(
+          "[MusicPlayer] Loading video with id:",
+          currentTrack.videoId
+        );
+        playerRef.current.loadVideoById(currentTrack.videoId);
+        if (window.myElectron && window.myElectron.updateTrack) {
+          window.myElectron.updateTrack(currentTrack);
+        }
+      }
+    }, 300); // 300ms debounce delay
+
+    return () => clearTimeout(debounceTimeout);
+  }, [currentTrack]);
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (window.myElectron) {
+      window.myElectron.on("toggle-play", () => {
+        console.log("[MusicPlayer] Received toggle-play IPC");
+        handlePlayPause();
+      });
+      window.myElectron.on("set-volume", (newVolume: number) => {
+        console.log("[MusicPlayer] Received set-volume IPC with", newVolume);
+        if (playerRef.current) {
+          playerRef.current.setVolume(newVolume);
+          setVolume(newVolume);
+        }
+      });
+    }
+  }, [isPlaying, currentTrack, volume]);
+
+  const handlePlayPause = () => {
+    if (!playerRef.current) return;
+    console.log("[MusicPlayer] Toggling play/pause. isPlaying:", isPlaying);
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.playVideo();
+    }
+    togglePlay();
+  };
+
+  function formatDuration(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  }
+
+  const onPlayerStateChange = (event: { data: number }) => {
+    if (event.data === 1) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = setInterval(() => {
         if (playerRef.current) {
-          const time = Math.floor(
-            (playerRef.current as ExtendedYTPlayer).getCurrentTime()
-          );
+          const time = Math.floor(playerRef.current.getCurrentTime());
           setCurrentTime(time);
+          console.log("[MusicPlayer] Current time:", time);
         }
       }, 500);
     } else {
@@ -130,25 +145,41 @@ const MusicPlayer: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  // Helper to format seconds into mm:ss format
-  function formatDuration(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  }
-
   const handleVideoEnd = () => {
+    console.log("[MusicPlayer] Video ended");
     if (queue.length > 0) {
       playNext();
-    } else if (currentTrack) {
+    } else {
       playerRef.current?.seekTo(0, true);
-      playerRef.current?.playVideo();
+    }
+  };
+
+  const openMiniPlayer = () => {
+    if (window.myElectron && currentTrack) {
+      console.log("[MusicPlayer] Opening mini player with", currentTrack);
+      window.myElectron.openMiniPlayer({
+        title: currentTrack.title,
+        artist: currentTrack.artist,
+        videoId: currentTrack.videoId,
+      });
+    } else {
+      console.log(
+        "[MusicPlayer] Browser fallback: opening mini player with query params"
+      );
+      if (currentTrack) {
+        const queryParams = new URLSearchParams({
+          title: currentTrack.title,
+          artist: currentTrack.artist,
+          videoId: currentTrack.videoId,
+        });
+        window.open(
+          `/miniplayer?${queryParams.toString()}`,
+          "Miniplayer",
+          "width=400,height=200"
+        );
+      } else {
+        window.open("/miniplayer", "Miniplayer", "width=400,height=200");
+      }
     }
   };
 
@@ -160,7 +191,7 @@ const MusicPlayer: React.FC = () => {
           <div className="w-[56px] h-[56px]">
             <Image
               src={currentTrack.albumCover}
-              alt={currentTrack.title}
+              alt={currentTrack.title ?? ""}
               width={56}
               height={56}
               className="rounded"
@@ -175,7 +206,7 @@ const MusicPlayer: React.FC = () => {
               href={`/track/${spotifyTrackId || "unknown"}`}
               className="text-white font-semibold text-[20px] hover:underline cursor-pointer truncate max-w-[200px]"
             >
-              {currentTrack.title || ""}
+              {currentTrack.title}
             </Link>
           )}
           {currentTrack && (
@@ -183,7 +214,7 @@ const MusicPlayer: React.FC = () => {
               href={`/artist/${artistId || "unknown"}`}
               className="text-[#ABAAB8] font-semibold hover:underline cursor-pointer truncate max-w-[200px]"
             >
-              {currentTrack.artist || ""}
+              {currentTrack.artist}
             </Link>
           )}
         </div>
@@ -214,7 +245,7 @@ const MusicPlayer: React.FC = () => {
               history.length === 0 && queue.length === 0 && !currentTrack
                 ? "opacity-50 hover:opacity-40 cursor-not-allowed"
                 : "cursor-pointer hover:opacity-80"
-            } `}
+            }`}
           />
           <Image
             src="/icons/nextsong.svg"
@@ -229,12 +260,12 @@ const MusicPlayer: React.FC = () => {
             onClick={playNext}
           />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <p className="text-sm text-gray-400 text-nowrap">
             {currentTrack ? formatDuration(currentTime) : "-:--"}
           </p>
           <div
-            className={`relative w-full h-[4px] bg-[#2A2A2A] rounded-full ${
+            className={`relative w-[80%] h-[4px] bg-[#2A2A2A] rounded-full ${
               !currentTrack ? "cursor-not-allowed" : "cursor-pointer"
             }`}
             onClick={(e) => {
@@ -242,7 +273,7 @@ const MusicPlayer: React.FC = () => {
               const rect = e.currentTarget.getBoundingClientRect();
               const clickX = e.clientX - rect.left;
               const percentage = clickX / rect.width;
-              const newTime = percentage * currentTrack.duration;
+              const newTime = percentage * (currentTrack.duration ?? 0);
               (playerRef.current as ExtendedYTPlayer).seekTo(newTime, true);
               setCurrentTime(newTime);
             }}
@@ -259,29 +290,37 @@ const MusicPlayer: React.FC = () => {
             ></div>
           </div>
           <p className="text-sm text-gray-400 text-nowrap">
-            {currentTrack ? formatDuration(currentTrack.duration) : "-:--"}
+            {currentTrack ? formatDuration(currentTrack.duration ?? 0) : "-:--"}
           </p>
         </div>
       </div>
 
       {/* Right Side: Extra Controls */}
-      <div className="flex gap-[40px]">
+      <div className="flex gap-[20px]">
         <Image
           src="/icons/loop.svg"
           alt="loop song"
-          width={24}
-          height={24}
-          className="cursor-pointer hover:opacity-80 w-auto h-auto"
+          width={16}
+          height={16}
+          className="cursor-not-allowed opacity-40"
         />
         <VolumeControl
           volume={volume}
           setVolume={setVolume}
           playerRef={playerRef}
-          currentVideoId={currentTrack?.videoId} // Pass the videoId so VolumeControl re-runs on track change
+          currentVideoId={currentTrack?.videoId}
+        />
+        <Image
+          src="/icons/miniplayer.svg"
+          alt="miniplayer"
+          width={24}
+          height={24}
+          className="cursor-pointer hover:opacity-80"
+          onClick={openMiniPlayer}
         />
       </div>
 
-      {/* YouTube Player (Hidden) */}
+      {/* Hidden YouTube Player */}
       {currentTrack && (
         <div className="hidden">
           <YouTube
@@ -292,9 +331,10 @@ const MusicPlayer: React.FC = () => {
               playerVars: { autoplay: 1, controls: 0, rel: 0, showinfo: 0 },
             }}
             onReady={(event) => {
+              console.log("[MusicPlayer] YouTube player ready");
               playerRef.current = event.target;
               event.target.setVolume(volume);
-              console.log("YouTube Player Ready! Volume set to", volume);
+              console.log("[MusicPlayer] Setting volume to", volume);
               event.target.playVideo();
             }}
             onStateChange={onPlayerStateChange}
