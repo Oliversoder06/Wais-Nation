@@ -38,6 +38,14 @@ interface ArtistSearchResponse {
   };
 }
 
+// Define an interface for recent search items (cards)
+interface RecentSearchItem {
+  type: "artist" | "track";
+  id: string;
+  name: string;
+  imageUrl: string;
+}
+
 // New function to search for artists
 async function searchArtists({
   query,
@@ -73,19 +81,20 @@ async function searchArtists({
 
 const DesktopSearchbar: React.FC = () => {
   const [query, setQuery] = useState<string>("");
+  const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([]);
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
   const [trackResults, setTrackResults] = useState<Track[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
-  // selectedIndex is a combined index for artists then tracks
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isElectron, setIsElectron] = useState<boolean>(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  // Create refs for each result item
   const resultsRefs = useRef<(HTMLDivElement | null)[]>([]);
   const router = useRouter();
 
-  // Total count for arrow navigation
-  const totalResults = artistResults.length + trackResults.length;
+  const totalResults =
+    query === ""
+      ? recentSearches.length
+      : artistResults.length + trackResults.length;
 
   // Check if running in Electron
   useEffect(() => {
@@ -104,17 +113,45 @@ const DesktopSearchbar: React.FC = () => {
       setSelectedIndex((prev) => Math.max(prev - 1, 0));
     } else if (e.key === "Enter") {
       if (selectedIndex !== -1) {
-        // Determine if the selected index is an artist or a track
-        if (selectedIndex < artistResults.length) {
-          const selectedArtist = artistResults[selectedIndex];
-          router.push(`/artist/${selectedArtist.id}`);
+        if (query === "") {
+          // Recent searches mode: navigate based on the selected recent search card.
+          const selectedItem = recentSearches[selectedIndex];
+          if (selectedItem.type === "artist") {
+            router.push(`/artist/${selectedItem.id}`);
+          } else {
+            router.push(`/track/${selectedItem.id}`);
+          }
+          setShowResults(false);
         } else {
-          const trackIndex = selectedIndex - artistResults.length;
-          const selectedTrack = trackResults[trackIndex];
-          router.push(`/track/${selectedTrack.id}`);
+          // Live search results mode: if a card is selected, navigate and save it.
+          let selectedItem;
+          if (selectedIndex < artistResults.length) {
+            selectedItem = artistResults[selectedIndex];
+            router.push(`/artist/${selectedItem.id}`);
+            saveSearch({
+              type: "artist",
+              id: selectedItem.id,
+              name: selectedItem.name,
+              imageUrl:
+                selectedItem.images && selectedItem.images[0]
+                  ? selectedItem.images[0].url
+                  : "/icons/default-artist.svg",
+            });
+          } else {
+            const trackIndex = selectedIndex - artistResults.length;
+            selectedItem = trackResults[trackIndex];
+            router.push(`/track/${selectedItem.id}`);
+            saveSearch({
+              type: "track",
+              id: selectedItem.id,
+              name: selectedItem.name,
+              imageUrl:
+                selectedItem.album.images?.[0]?.url || "/images/Playlist.svg",
+            });
+          }
+          setShowResults(false);
+          setQuery("");
         }
-        setShowResults(false);
-        setQuery("");
       }
     }
   };
@@ -129,14 +166,13 @@ const DesktopSearchbar: React.FC = () => {
   }, [selectedIndex]);
 
   useEffect(() => {
-    if (query.length > 2) {
+    if (query.length > 0) {
       const debounceTimeout = setTimeout(() => {
         (async () => {
           try {
-            // Run both searches concurrently: top 2 artists and up to 15 tracks
             const [artistData, trackData] = await Promise.all([
               searchArtists({ query, limit: 2 }),
-              searchSpotify({ query, limit: 15 }) as Promise<TrackSearchResult>,
+              searchSpotify({ query, limit: 40 }) as Promise<TrackSearchResult>,
             ]);
             setArtistResults(artistData ? artistData.artists.items : []);
             setTrackResults(trackData ? trackData.tracks.items : []);
@@ -148,12 +184,10 @@ const DesktopSearchbar: React.FC = () => {
           }
         })();
       }, 200);
-
       return () => clearTimeout(debounceTimeout);
     } else {
       setArtistResults([]);
       setTrackResults([]);
-      setShowResults(false);
       setSelectedIndex(-1);
     }
   }, [query]);
@@ -167,14 +201,39 @@ const DesktopSearchbar: React.FC = () => {
         setShowResults(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside, {
       passive: true,
     });
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  let globalIndex = 0;
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("recentSearches") || "[]"
+    ) as RecentSearchItem[];
+    setRecentSearches(saved);
+  }, []);
+
+  const saveSearch = (item: RecentSearchItem) => {
+    let searches = JSON.parse(
+      localStorage.getItem("recentSearches") || "[]"
+    ) as RecentSearchItem[];
+    searches = [
+      item,
+      ...searches.filter((s: RecentSearchItem) => s.id !== item.id),
+    ].slice(0, 5);
+    localStorage.setItem("recentSearches", JSON.stringify(searches));
+    setRecentSearches(searches);
+  };
+
+  const removeRecentSearch = (id: string) => {
+    let searches = JSON.parse(
+      localStorage.getItem("recentSearches") || "[]"
+    ) as RecentSearchItem[];
+    searches = searches.filter((item) => item.id !== id);
+    localStorage.setItem("recentSearches", JSON.stringify(searches));
+    setRecentSearches(searches);
+  };
 
   // Set top position: if Electron, top-[48px], else top-0.
   const topClass = isElectron ? "top-[48px]" : "top-0";
@@ -183,11 +242,13 @@ const DesktopSearchbar: React.FC = () => {
     <div
       className={`fixed ${topClass} left-0 md:py-[8px] w-full flex justify-center ml-[144px] xl:w-[calc(100%-508px)] md:w-[calc(100%-144px)] z-[1000]`}
     >
-      <div ref={searchRef} className="relative hidden md:flex">
+      <div ref={searchRef} className="relative hidden md:flex flex-col">
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+          }}
           placeholder="Search for tracks and artists..."
           className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
           onFocus={() => setShowResults(true)}
@@ -200,101 +261,180 @@ const DesktopSearchbar: React.FC = () => {
           height={20}
           className="absolute top-[50%] left-[12px] transform -translate-y-1/2"
         />
-        {showResults &&
-          (artistResults.length > 0 || trackResults.length > 0) && (
-            <div className="absolute top-full left-0 right-0 bg-background shadow-lg rounded mt-2 max-h-96 overflow-y-auto scrollbar z-[1000]">
-              {/* Top 2 Artists Section */}
-              {artistResults.length > 0 && (
-                <div className="border-b border-container pb-2">
-                  {artistResults.map((artist) => {
-                    const currentIndex = globalIndex;
-                    globalIndex++;
-                    return (
-                      <Link
-                        href={`/artist/${artist.id}`}
-                        key={artist.id}
-                        passHref
+        {showResults && (
+          <div className="absolute top-full left-0 right-0 bg-background shadow-lg rounded mt-2 max-h-96 overflow-y-auto scrollbar z-[1000]">
+            {query === "" ? (
+              <div className="flex flex-col">
+                {recentSearches.length > 0 ? (
+                  recentSearches.map((item, index) => (
+                    <div
+                      key={item.id}
+                      ref={(el) => {
+                        resultsRefs.current[index] = el;
+                      }}
+                      className={`p-2 hover:bg-container cursor-pointer flex items-center justify-between gap-2 ${
+                        selectedIndex === index ? "bg-container" : ""
+                      }`}
+                      onClick={() => {
+                        if (item.type === "artist") {
+                          router.push(`/artist/${item.id}`);
+                        } else {
+                          router.push(`/track/${item.id}`);
+                        }
+                        setShowResults(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          width={40}
+                          height={40}
+                          className={
+                            item.type === "artist" ? "rounded-full" : "rounded"
+                          }
+                        />
+                        <p className="font-semibold text-white">{item.name}</p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRecentSearch(item.id);
+                        }}
+                        className="text-white hover:text-red-500"
                       >
-                        <div
-                          ref={(el) => {
-                            resultsRefs.current[currentIndex] = el;
-                          }}
-                          className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
-                            selectedIndex === currentIndex ? "bg-container" : ""
-                          }`}
-                          onClick={() => {
-                            setQuery("");
-                            setShowResults(false);
-                          }}
+                        <Image
+                          src="/icons/cross.svg"
+                          alt="remove"
+                          width={20}
+                          height={20}
+                          className="cursor-pointer opacity-50 hover:opacity-100"
+                        />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-2 text-white">No recent searches</div>
+                )}
+              </div>
+            ) : (
+              // Show live search results (artists & tracks) when there is a query
+              <>
+                {artistResults.length > 0 && (
+                  <div className="border-b border-container pb-2">
+                    {artistResults.map((artist, idx) => {
+                      const currentIndex = idx;
+                      return (
+                        <Link
+                          href={`/artist/${artist.id}`}
+                          key={artist.id}
+                          passHref
                         >
-                          {artist.images && artist.images[0] && (
+                          <div
+                            ref={(el) => {
+                              resultsRefs.current[currentIndex] = el;
+                            }}
+                            className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
+                              selectedIndex === currentIndex
+                                ? "bg-container"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              saveSearch({
+                                type: "artist",
+                                id: artist.id,
+                                name: artist.name,
+                                imageUrl:
+                                  artist.images && artist.images[0]
+                                    ? artist.images[0].url
+                                    : "/icons/default-artist.svg",
+                              });
+                              setShowResults(false);
+                              setQuery("");
+                            }}
+                          >
+                            {artist.images && artist.images[0] && (
+                              <Image
+                                src={artist.images[0].url}
+                                alt={artist.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                              />
+                            )}
+                            <div>
+                              <p className="font-semibold text-white">
+                                {artist.name}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+                {trackResults.length > 0 && (
+                  <div className="pt-2">
+                    {trackResults.map((track, idx) => {
+                      const currentIndex = artistResults.length + idx;
+                      return (
+                        <Link
+                          href={`/track/${track.id}`}
+                          key={track.id}
+                          passHref
+                        >
+                          <div
+                            ref={(el) => {
+                              resultsRefs.current[currentIndex] = el;
+                            }}
+                            className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
+                              selectedIndex === currentIndex
+                                ? "bg-container"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              saveSearch({
+                                type: "track",
+                                id: track.id,
+                                name: track.name,
+                                imageUrl:
+                                  track.album.images?.[0]?.url ||
+                                  "/images/Playlist.svg",
+                              });
+                              setShowResults(false);
+                              setQuery("");
+                            }}
+                          >
                             <Image
-                              src={artist.images[0].url}
-                              alt={artist.name}
+                              src={
+                                track.album.images?.[0]?.url ||
+                                "/images/Playlist.svg"
+                              }
+                              alt="album cover"
                               width={40}
                               height={40}
-                              className="rounded-full"
+                              className="rounded"
                             />
-                          )}
-                          <div>
-                            <p className="font-semibold text-white">
-                              {artist.name}
-                            </p>
+                            <div>
+                              <p className="font-semibold text-white">
+                                {track.name}
+                              </p>
+                              <p className="text-sm text-nit">
+                                {track.artists
+                                  .map((artist) => artist.name)
+                                  .join(", ")}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-              {/* Track Results Section */}
-              {trackResults.length > 0 && (
-                <div className="pt-2">
-                  {trackResults.map((track) => {
-                    const currentIndex = globalIndex;
-                    globalIndex++;
-                    return (
-                      <Link href={`/track/${track.id}`} key={track.id} passHref>
-                        <div
-                          ref={(el) => {
-                            resultsRefs.current[currentIndex] = el;
-                          }}
-                          className={`p-2 hover:bg-container cursor-pointer flex items-center gap-2 ${
-                            selectedIndex === currentIndex ? "bg-container" : ""
-                          }`}
-                          onClick={() => {
-                            setQuery("");
-                            setShowResults(false);
-                          }}
-                        >
-                          <Image
-                            src={
-                              track.album.images?.[0]?.url ||
-                              "/images/Playlist.svg"
-                            }
-                            alt="album cover"
-                            width={40}
-                            height={40}
-                            className="rounded"
-                          />
-                          <div>
-                            <p className="font-semibold text-white">
-                              {track.name}
-                            </p>
-                            <p className="text-sm text-nit">
-                              {track.artists
-                                .map((artist) => artist.name)
-                                .join(", ")}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
