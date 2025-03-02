@@ -59,9 +59,23 @@ interface ArtistItem {
 
 const RecentlyPlayed = () => {
   const { history } = useMusicStore();
+
+  // A flag to ensure we only render client-side
+  const [mounted, setMounted] = useState(false);
   const [artists, setArtists] = useState<ArtistItem[]>([]);
 
-  // Memoized unique artist names to avoid re-computation
+  // On mount, mark the component as mounted and read from localStorage.
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("recentlyPlayedArtists");
+      if (stored) {
+        setArtists(JSON.parse(stored));
+      }
+    }
+  }, []);
+
+  // Memoized unique artist names to avoid re-computation.
   const uniqueArtistNames = useMemo(
     () => Array.from(new Set(history.map((track) => track.artist))),
     [history]
@@ -91,11 +105,23 @@ const RecentlyPlayed = () => {
       const validArtists = results.filter(
         (artist): artist is ArtistItem => artist !== null
       );
-      setArtists(validArtists.slice(0, 6));
+      const slicedArtists = validArtists.slice(0, 6);
+      setArtists(slicedArtists);
+
+      // Save the fetched artists into localStorage.
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "recentlyPlayedArtists",
+          JSON.stringify(slicedArtists)
+        );
+      }
     };
 
     fetchArtists();
-  }, [uniqueArtistNames]); // Depend on `uniqueArtistNames` directly
+  }, [uniqueArtistNames]);
+
+  // Until mounted, render nothing (or you can render a loading state).
+  if (!mounted) return null;
 
   return (
     <div className="flex flex-wrap md:gap-4 gap-[8px] max-w-[1000px] justify-center">
