@@ -4,6 +4,7 @@ import Link from "next/link";
 import RecentlyPlayedCard from "./RecentlyPlayedCard";
 import { useMusicStore } from "@/store/musicStore";
 import { getSpotifyToken } from "@/lib/spotify";
+import { useUser } from "@clerk/nextjs";
 
 // --- Types and helper for searching artists ---
 interface Artist {
@@ -58,30 +59,40 @@ interface ArtistItem {
 }
 
 const RecentlyPlayed = () => {
+  // Call all hooks unconditionally
+  const { user } = useUser();
   const { history } = useMusicStore();
-
-  // A flag to ensure we only render client-side
   const [mounted, setMounted] = useState(false);
   const [artists, setArtists] = useState<ArtistItem[]>([]);
 
-  // On mount, mark the component as mounted and read from localStorage.
+  // Mark the component as mounted (client-side)
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("recentlyPlayedArtists");
+  }, []);
+
+  // Use a user-specific key if a user exists, otherwise a default key.
+  const storageKey = user
+    ? `recentlyPlayedArtists_${user.id}`
+    : "recentlyPlayedArtists_default";
+
+  // Load artists from localStorage on mount (if available) when a user exists.
+  useEffect(() => {
+    if (typeof window !== "undefined" && user) {
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         setArtists(JSON.parse(stored));
       }
     }
-  }, []);
+  }, [storageKey, user]);
 
-  // Memoized unique artist names to avoid re-computation.
+  // Memoize unique artist names to avoid re-computation
   const uniqueArtistNames = useMemo(
     () => Array.from(new Set(history.map((track) => track.artist))),
     [history]
   );
 
   useEffect(() => {
+    if (!user) return; // Only fetch if user is logged in
     const fetchArtists = async () => {
       if (uniqueArtistNames.length === 0) return;
 
@@ -108,19 +119,20 @@ const RecentlyPlayed = () => {
       const slicedArtists = validArtists.slice(0, 6);
       setArtists(slicedArtists);
 
-      // Save the fetched artists into localStorage.
+      // Save the fetched artists into localStorage
       if (typeof window !== "undefined") {
-        localStorage.setItem(
-          "recentlyPlayedArtists",
-          JSON.stringify(slicedArtists)
-        );
+        localStorage.setItem(storageKey, JSON.stringify(slicedArtists));
       }
     };
 
     fetchArtists();
-  }, [uniqueArtistNames]);
+  }, [uniqueArtistNames, storageKey, user]);
 
-  // Until mounted, render nothing (or you can render a loading state).
+  // Now decide what to render
+  if (!user) {
+    return null;
+  }
+
   if (!mounted) return null;
 
   return (

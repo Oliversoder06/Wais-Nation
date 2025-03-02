@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { searchSpotify } from "@/lib/spotify";
-import { getSpotifyToken } from "@/lib/spotify";
+import { searchSpotify, getSpotifyToken } from "@/lib/spotify";
+import { useUser } from "@clerk/nextjs";
 
 // Define interfaces for Artists and Tracks
 interface Artist {
@@ -80,6 +80,9 @@ async function searchArtists({
 }
 
 const DesktopSearchbar: React.FC = () => {
+  const { user } = useUser();
+  const router = useRouter();
+
   const [query, setQuery] = useState<string>("");
   const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([]);
   const [artistResults, setArtistResults] = useState<Artist[]>([]);
@@ -87,23 +90,27 @@ const DesktopSearchbar: React.FC = () => {
   const [showResults, setShowResults] = useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isElectron, setIsElectron] = useState<boolean>(false);
+
   const searchRef = useRef<HTMLDivElement>(null);
   const resultsRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const router = useRouter();
 
+  // Total results depend on query length.
   const totalResults =
     query === ""
       ? recentSearches.length
       : artistResults.length + trackResults.length;
 
-  // Check if running in Electron
+  // Check if running in Electron.
   useEffect(() => {
-    if (typeof window !== "undefined" && window.myElectron) {
+    if (
+      typeof window !== "undefined" &&
+      (window as Window & { myElectron?: boolean }).myElectron
+    ) {
       setIsElectron(true);
     }
   }, []);
 
-  // Handle arrow keys and Enter on the input
+  // Handle arrow keys and Enter on the input.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -114,7 +121,7 @@ const DesktopSearchbar: React.FC = () => {
     } else if (e.key === "Enter") {
       if (selectedIndex !== -1) {
         if (query === "") {
-          // Recent searches mode: navigate based on the selected recent search card.
+          // Recent searches mode: navigate based on the selected recent search.
           const selectedItem = recentSearches[selectedIndex];
           if (selectedItem.type === "artist") {
             router.push(`/artist/${selectedItem.id}`);
@@ -123,7 +130,7 @@ const DesktopSearchbar: React.FC = () => {
           }
           setShowResults(false);
         } else {
-          // Live search results mode: if a card is selected, navigate and save it.
+          // Live search results mode.
           let selectedItem;
           if (selectedIndex < artistResults.length) {
             selectedItem = artistResults[selectedIndex];
@@ -207,31 +214,41 @@ const DesktopSearchbar: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const saved = JSON.parse(
-      localStorage.getItem("recentSearches") || "[]"
-    ) as RecentSearchItem[];
-    setRecentSearches(saved);
-  }, []);
+  // Define a user-specific storage key. If no user is signed in, recent searches won't be persisted.
+  const storageKey = user ? `recentSearches_${user.id}` : null;
 
+  // Load recent searches from localStorage when the component mounts or when the user changes.
+  useEffect(() => {
+    if (storageKey && typeof window !== "undefined") {
+      const saved = JSON.parse(
+        localStorage.getItem(storageKey) || "[]"
+      ) as RecentSearchItem[];
+      setRecentSearches(saved);
+    }
+  }, [storageKey]);
+
+  // Save a search item using the user-specific key.
   const saveSearch = (item: RecentSearchItem) => {
+    if (!storageKey) return;
     let searches = JSON.parse(
-      localStorage.getItem("recentSearches") || "[]"
+      localStorage.getItem(storageKey) || "[]"
     ) as RecentSearchItem[];
     searches = [
       item,
       ...searches.filter((s: RecentSearchItem) => s.id !== item.id),
     ].slice(0, 5);
-    localStorage.setItem("recentSearches", JSON.stringify(searches));
+    localStorage.setItem(storageKey, JSON.stringify(searches));
     setRecentSearches(searches);
   };
 
+  // Remove a recent search item.
   const removeRecentSearch = (id: string) => {
+    if (!storageKey) return;
     let searches = JSON.parse(
-      localStorage.getItem("recentSearches") || "[]"
+      localStorage.getItem(storageKey) || "[]"
     ) as RecentSearchItem[];
     searches = searches.filter((item) => item.id !== id);
-    localStorage.setItem("recentSearches", JSON.stringify(searches));
+    localStorage.setItem(storageKey, JSON.stringify(searches));
     setRecentSearches(searches);
   };
 
@@ -246,9 +263,7 @@ const DesktopSearchbar: React.FC = () => {
         <input
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-          }}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="Search for tracks and artists..."
           className="w-[452px] h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
           onFocus={() => setShowResults(true)}
@@ -318,7 +333,6 @@ const DesktopSearchbar: React.FC = () => {
                 )}
               </div>
             ) : (
-              // Show live search results (artists & tracks) when there is a query
               <>
                 {artistResults.length > 0 && (
                   <div className="border-b border-container pb-2">
