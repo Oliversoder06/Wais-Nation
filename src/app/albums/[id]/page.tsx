@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAlbumDetails } from "@/lib/spotify";
 import React from "react";
-import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
 import Link from "next/link";
 
@@ -29,7 +28,7 @@ export default async function AlbumPage({ params }: AlbumPageProps) {
     <div className="bg-secondary text-white min-h-screen">
       {/* Album Header */}
       <div className="flex items-end p-8 bg-gradient-to-t from-secondary to-container">
-        <Image
+        <img
           src={album.images?.[0]?.url}
           alt={album.name}
           width={256}

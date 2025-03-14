@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -26,7 +25,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({
         className="max-w-[240px] rounded-lg hover:bg-container transition p-4 select-none"
       >
         <div className="relative">
-          <Image
+          <img
             src={albumCover}
             alt={albumTitle}
             width={192}

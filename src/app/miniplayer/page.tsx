@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
 interface Track {
   title: string;
@@ -50,7 +49,7 @@ const MiniPlayer: React.FC = () => {
       {track ? (
         <>
           <div className="flex items-center gap-4">
-            <Image
+            <img
               src={`https://i.ytimg.com/vi/${track.videoId}/hqdefault.jpg`}
               alt="Thumbnail"
               width={60}
@@ -69,19 +68,14 @@ const MiniPlayer: React.FC = () => {
           <div className="w-full flex justify-center gap-4 mt-4">
             <button onClick={handlePlayPause}>
               {isPlaying ? (
-                <Image
+                <img
                   src="/icons/pause.svg"
                   width={40}
                   height={40}
                   alt="Pause"
                 />
               ) : (
-                <Image
-                  src="/icons/play.svg"
-                  width={40}
-                  height={40}
-                  alt="Play"
-                />
+                <img src="/icons/play.svg" width={40} height={40} alt="Play" />
               )}
             </button>
           </div>

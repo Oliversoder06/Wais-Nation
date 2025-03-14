@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import NavigationItem from "./NavigationItem";
 import AuthButtons from "./AuthButtons";
 import { UserButton } from "@clerk/nextjs";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -30,7 +29,7 @@ const Sidebar: React.FC = () => {
         className={`${heightClass} w-[144px] bg-secondary flex items-start pl-[30px] justify-between flex-col py-[28px] rounded-r-lg transition-colors duration-300`}
       >
         <Link href="/">
-          <Image
+          <img
             src="/images/Logo.svg"
             alt="logo"
             width={64}

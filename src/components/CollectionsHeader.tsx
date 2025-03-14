@@ -1,4 +1,3 @@
-import Image from "next/image";
 import React from "react";
 interface CollectionsHeaderProps {
   gradient: string;
@@ -18,7 +17,7 @@ const CollectionsHeader = ({
       <div
         className={`h-[calc(20vh)] bg-gradient-to-t ${gradient} flex flex-col md:flex-row md:justify-center items-center md:gap-[40px] gap-[32px] pt-8`}
       >
-        <Image
+        <img
           src={`/icons/${image}Page.svg`}
           alt="heart"
           width={150}

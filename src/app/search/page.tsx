@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { searchSpotify } from "@/lib/spotify";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -88,7 +87,7 @@ const Page: React.FC = () => {
             className="w-full h-[48px] bg-container rounded-full text-white placeholder:text-nit px-[44px] border-none outline-none"
             onFocus={() => setShowResults(true)}
           />
-          <Image
+          <img
             src="/icons/searchicon.svg"
             alt="search"
             width={20}
@@ -106,7 +105,7 @@ const Page: React.FC = () => {
                       setShowResults(false);
                     }}
                   >
-                    <Image
+                    <img
                       src={
                         track.album.images?.[0]?.url || "/images/Playlist.svg"
                       }

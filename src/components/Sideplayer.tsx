@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { useMusicStore } from "@/store/musicStore";
 import {
@@ -145,7 +144,7 @@ const Sideplayer = () => {
 
   return (
     <div className=" ">
-      <Image
+      <img
         src="/icons/open-sidebar.svg"
         alt="open sidebar"
         width={40}
@@ -177,7 +176,7 @@ const Sideplayer = () => {
                     {artistName}
                   </span>
                 </div>
-                <Image
+                <img
                   src={isLiked ? "/icons/Heart.svg" : "/icons/emptyheart.svg"}
                   alt="like button"
                   width={28}
@@ -189,7 +188,7 @@ const Sideplayer = () => {
 
               <div className="relative z-10 mx-auto">
                 {artistPfp && (
-                  <Image
+                  <img
                     src={artistPfp}
                     alt="Artist Profile"
                     width={280}
@@ -217,7 +216,7 @@ const Sideplayer = () => {
             </span>
             <span className="text-[#ABAABB] font-medium">{artistName}</span>
           </div>
-          <Image
+          <img
             src={isLiked ? "/icons/Heart.svg" : "/icons/emptyheart.svg"}
             alt="like button"
             width={28}
@@ -228,7 +227,7 @@ const Sideplayer = () => {
         </div>
         <div className="relative z-10 mx-auto">
           {artistPfp && (
-            <Image
+            <img
               src={artistPfp}
               alt="Artist Profile"
               width={280}

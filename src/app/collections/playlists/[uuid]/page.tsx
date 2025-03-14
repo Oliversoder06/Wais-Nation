@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import Image from "next/image";
 import LongSongCard from "@/components/LongSongCard";
 import toast from "react-hot-toast";
 import { updatePlaylist } from "@/lib/playlists";
@@ -132,7 +131,7 @@ export default function PlaylistPage() {
         className="flex flex-col items-center mt-10 text-white cursor-pointer"
         onClick={handleEdit}
       >
-        <Image
+        <img
           src="/images/Playlist.svg"
           alt="Playlist Image"
           width={200}
@@ -152,7 +151,7 @@ export default function PlaylistPage() {
           <div className="bg-secondary p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
             <div className="flex justify-between">
               <h2 className="text-white text-2xl font-bold">Update Playlist</h2>
-              <Image
+              <img
                 src="/icons/cross.svg"
                 alt="cross icon"
                 width={28}
@@ -218,14 +217,14 @@ export default function PlaylistPage() {
       <div className="flex flex-col gap-4 mx-[12px] md:mx-[40px]">
         <div className="flex flex-col gap-1">
           <div className="md:flex gap-[20px] items-center md:px-4 px-2 pb-2 hidden">
-            <Image
+            <img
               src="/icons/play.svg"
               alt="play"
               width={48}
               height={48}
               className="cursor-pointer"
             />
-            <Image
+            <img
               src="/icons/loop.svg"
               alt="loop"
               width={28}
@@ -245,8 +244,8 @@ export default function PlaylistPage() {
         </div>
         <div className="flex flex-col md:mb-0 mb-20">
           <div className="flex gap-4 items-center px-4 pb-2 md:hidden">
-            <Image src="/icons/play.svg" alt="play" width={48} height={48} />
-            <Image
+            <img src="/icons/play.svg" alt="play" width={48} height={48} />
+            <img
               src="/icons/loop.svg"
               alt="loop"
               width={28}

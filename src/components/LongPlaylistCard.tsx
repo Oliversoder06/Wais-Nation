@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { deletePlaylist } from "@/lib/playlists";
 import toast from "react-hot-toast";
@@ -43,12 +42,11 @@ const LongPlaylistCard: React.FC<LongPlaylistCardProps> = ({
       >
         <div className="flex md:gap-4 gap-2 items-center">
           {/* Playlist Image Placeholder */}
-          <Image
+          <img
             src="/images/Playlist.svg"
             alt="Playlist Image"
             width={104}
             height={104}
-            unoptimized={true}
             className="md:w-[104px] md:h-[104px] w-[64px] h-[64px]"
           />
 

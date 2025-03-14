@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -12,7 +11,7 @@ const MobileNav: React.FC = () => {
   return (
     <div className="bg-secondary h-[100px] w-full fixed bottom-0 flex items-center justify-between px-[32px] z-[110]">
       <Link href="/" className="flex flex-col gap-[8px] items-center">
-        <Image
+        <img
           src={
             pathname === "/"
               ? "/icons/mobile/mobile-home-active.svg"
@@ -31,7 +30,7 @@ const MobileNav: React.FC = () => {
         </span>
       </Link>
       <Link href="/search" className="flex flex-col gap-[8px] items-center">
-        <Image
+        <img
           src={
             pathname === "/search"
               ? "/icons/mobile/mobile-search-active.svg"
@@ -53,7 +52,7 @@ const MobileNav: React.FC = () => {
         href="/collections/playlists"
         className="flex flex-col gap-[8px] items-center"
       >
-        <Image
+        <img
           src={
             pathname === "/collections/playlists"
               ? "/icons/mobile/mobile-library-active.svg"
@@ -77,7 +76,7 @@ const MobileNav: React.FC = () => {
         href="/collections/liked"
         className="flex flex-col gap-[8px] items-center"
       >
-        <Image
+        <img
           src={
             pathname === "/collections/liked"
               ? "/icons/mobile/mobile-liked-active.svg"

@@ -1,6 +1,5 @@
 // TitleBar.tsx
 "use client";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { MdClose, MdMinimize, MdFullscreen } from "react-icons/md";
@@ -47,7 +46,7 @@ const TitleBar: React.FC = () => {
       <div>
         {pathname === "/miniplayer" ? (
           <div className="w-full flex items-center justify-center">
-            <Image
+            <img
               src="/icons/dragdots.svg"
               alt="Drag dots icon"
               width={40}

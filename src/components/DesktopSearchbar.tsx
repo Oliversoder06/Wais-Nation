@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -269,7 +268,7 @@ const DesktopSearchbar: React.FC = () => {
           onFocus={() => setShowResults(true)}
           onKeyDown={handleKeyDown}
         />
-        <Image
+        <img
           src="/icons/searchicon.svg"
           alt="search"
           width={20}
@@ -300,7 +299,7 @@ const DesktopSearchbar: React.FC = () => {
                       }}
                     >
                       <div className="flex items-center gap-2">
-                        <Image
+                        <img
                           src={item.imageUrl}
                           alt={item.name}
                           width={40}
@@ -318,7 +317,7 @@ const DesktopSearchbar: React.FC = () => {
                         }}
                         className="text-white hover:text-red-500"
                       >
-                        <Image
+                        <img
                           src="/icons/cross.svg"
                           alt="remove"
                           width={20}
@@ -368,12 +367,12 @@ const DesktopSearchbar: React.FC = () => {
                             }}
                           >
                             {artist.images && artist.images[0] && (
-                              <Image
+                              <img
                                 src={artist.images[0].url}
                                 alt={artist.name}
                                 width={40}
                                 height={40}
-                                className="rounded-full"
+                                className="rounded-full size-[40px]"
                               />
                             )}
                             <div>
@@ -419,7 +418,7 @@ const DesktopSearchbar: React.FC = () => {
                               setQuery("");
                             }}
                           >
-                            <Image
+                            <img
                               src={
                                 track.album.images?.[0]?.url ||
                                 "/images/Playlist.svg"

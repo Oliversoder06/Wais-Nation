@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -44,7 +43,7 @@ const NavigationItem = ({
               : "hover:bg-[#2A2932]" // Hover Effect
           }`}
         >
-          <Image src={icon} alt={`${alt} icon`} width={28} height={28} />
+          <img src={icon} alt={`${alt} icon`} width={28} height={28} />
         </motion.div>
       </div>
       <span

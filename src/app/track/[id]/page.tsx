@@ -4,7 +4,6 @@ import { getTrackDetails } from "@/lib/spotify";
 import { useState, useEffect, use } from "react";
 import { notFound } from "next/navigation";
 import LongSongCard from "@/components/LongSongCard";
-import Image from "next/image";
 
 interface Artist {
   name: string;
@@ -63,7 +62,7 @@ export default function TrackPage({ params }: TrackPageProps) {
         />
         <div className="relative flex justify-center items-center md:gap-[64px] gap-[32px] h-full">
           <div className="md:size-[248px] size-[200px] rounded-[24px] flex items-center justify-center">
-            <Image
+            <img
               src={track.album.images?.[0]?.url || "/images/Playlist.svg"}
               alt="album cover"
               width={300}

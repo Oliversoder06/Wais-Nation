@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import React, { useEffect } from "react";
 
 interface VolumeControlProps {
@@ -75,7 +74,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
 
   return (
     <div className="relative flex items-center justify-center">
-      <Image
+      <img
         src={
           volume === 0
             ? "/icons/volumemute.svg"

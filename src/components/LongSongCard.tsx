@@ -1,7 +1,6 @@
 "use client";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@clerk/nextjs";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { searchYouTube, parseDuration } from "@/lib/youtube";
@@ -110,7 +109,7 @@ export default function LongSongCard({
           {loading ? (
             <div className="loader" />
           ) : cover ? (
-            <Image
+            <img
               src={cover}
               alt={title}
               width={48}
@@ -118,7 +117,7 @@ export default function LongSongCard({
               className="rounded-sm"
             />
           ) : (
-            <Image
+            <img
               src="/images/Playlist.svg"
               alt="Song Cover"
               width={48}
@@ -192,7 +191,7 @@ export default function LongSongCard({
                 setShowModal(true);
               }}
             >
-              <Image
+              <img
                 src="/icons/create-plus.svg"
                 alt="Menu"
                 width={36}
@@ -227,7 +226,7 @@ export default function LongSongCard({
           {loading ? (
             <div className="loader" />
           ) : cover ? (
-            <Image
+            <img
               src={cover}
               alt={title}
               width={48}
@@ -235,7 +234,7 @@ export default function LongSongCard({
               className="rounded-sm"
             />
           ) : (
-            <Image
+            <img
               src="/images/Playlist.svg"
               alt="Song Cover"
               width={48}

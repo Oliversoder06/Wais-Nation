@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import YouTube from "react-youtube";
 import { useMusicStore } from "@/store/musicStore";
@@ -190,7 +189,7 @@ const MusicPlayer: React.FC = () => {
       <div className="flex gap-[20px] items-center">
         {currentTrack?.albumCover ? (
           <div className="w-[56px] h-[56px]">
-            <Image
+            <img
               src={currentTrack.albumCover}
               alt={currentTrack.title ?? ""}
               width={56}
@@ -224,7 +223,7 @@ const MusicPlayer: React.FC = () => {
       {/* Middle: Playback Controls */}
       <div className="flex flex-col w-[50%] gap-[4px] absolute left-1/2 transform -translate-x-1/2">
         <div className="flex gap-[28px] self-center">
-          <Image
+          <img
             src="/icons/prevsong.svg"
             alt="prev song"
             width={24}
@@ -236,7 +235,7 @@ const MusicPlayer: React.FC = () => {
             }`}
             onClick={playPrevious}
           />
-          <Image
+          <img
             src={isPlaying ? "/icons/pause.svg" : "/icons/play.svg"}
             alt={isPlaying ? "pause song" : "play song"}
             width={36}
@@ -248,7 +247,7 @@ const MusicPlayer: React.FC = () => {
                 : "cursor-pointer hover:opacity-80"
             }`}
           />
-          <Image
+          <img
             src="/icons/nextsong.svg"
             alt="next song"
             width={24}
@@ -298,7 +297,7 @@ const MusicPlayer: React.FC = () => {
 
       {/* Right Side: Extra Controls */}
       <div className="flex gap-[20px]">
-        <Image
+        <img
           src="/icons/loop.svg"
           alt="loop song"
           width={16}
@@ -311,7 +310,7 @@ const MusicPlayer: React.FC = () => {
           playerRef={playerRef}
           currentVideoId={currentTrack?.videoId}
         />
-        <Image
+        <img
           src="/icons/miniplayer.svg"
           alt="miniplayer"
           width={24}

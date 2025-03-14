@@ -1,6 +1,5 @@
 // src/components/AddToPlaylistModal.tsx
 import React from "react";
-import Image from "next/image";
 
 interface Playlist {
   id: string;
@@ -40,7 +39,7 @@ const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
       <div className="bg-[#2b2b2b] p-6 rounded-lg shadow-lg w-[400px] flex flex-col gap-4">
         <div className="flex justify-between">
           <h2 className="text-white text-2xl font-bold">Add to Playlist</h2>
-          <Image
+          <img
             src="/icons/cross.svg"
             alt="cross icon"
             width={28}

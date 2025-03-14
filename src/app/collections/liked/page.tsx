@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import CollectionsHeader from "@/components/CollectionsHeader";
 import LongSongCard from "@/components/LongSongCard";
-import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
@@ -76,7 +75,7 @@ const Liked = () => {
             text="Liked Songs"
             type={`${amount} Songs`}
           />
-          <Image
+          <img
             src="/icons/play.svg"
             alt="play"
             width={48}
@@ -132,7 +131,7 @@ const Liked = () => {
               {amount} {amount === 1 ? "song" : "songs"}
             </span>
           </div>
-          <Image src="/icons/play.svg" alt="play" width={48} height={48} />
+          <img src="/icons/play.svg" alt="play" width={48} height={48} />
         </div>
         <div className="flex flex-col  pb-[100px]">
           {loading ? (

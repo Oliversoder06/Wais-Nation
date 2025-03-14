@@ -1,7 +1,6 @@
 "use client";
 
 import LongPlaylistCard from "@/components/LongPlaylistCard";
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { SignInButton, useAuth } from "@clerk/nextjs";
@@ -87,7 +86,7 @@ const Playlists: React.FC = () => {
         />
         <div className="flex items-center justify-end mr-[40px]">
           {isSignedIn ? (
-            <Image
+            <img
               src="/icons/create-plus.svg"
               alt="Create New Playlist"
               width={64}
@@ -116,7 +115,7 @@ const Playlists: React.FC = () => {
                 <h2 className="text-white text-2xl font-bold">
                   Create New Playlist
                 </h2>
-                <Image
+                <img
                   src="/icons/cross.svg"
                   alt="cross icon"
                   width={28}
@@ -219,7 +218,7 @@ const Playlists: React.FC = () => {
               </span>
             </div>
             {isSignedIn ? (
-              <Image
+              <img
                 src="/icons/create-plus.svg"
                 alt="Create New Playlist"
                 width={48}
@@ -279,7 +278,7 @@ const Playlists: React.FC = () => {
                     <h2 className="text-white text-2xl font-bold">
                       Create New Playlist
                     </h2>
-                    <Image
+                    <img
                       src="/icons/cross.svg"
                       alt="cross icon"
                       width={28}
