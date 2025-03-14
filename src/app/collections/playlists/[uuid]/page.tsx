@@ -258,17 +258,27 @@ export default function PlaylistPage() {
               No tracks added to this playlist yet.
             </p>
           ) : (
-            track.map((track) => (
-              <LongSongCard
-                key={track.id}
-                title={track.title || "Unknown Title"}
-                artist={track.artist || "Unknown Title"}
-                album={track.album || "Unknown Album"}
-                date={formatDate(track.added_at)}
-                duration={track.duration || "-:--"}
-                cover={track.cover}
-              />
-            ))
+            track.map((track) => {
+              const [minutes, seconds] = track.duration.split(":").map(Number);
+              const totalSeconds = minutes * 60 + seconds + 1;
+              const newMinutes = Math.floor(totalSeconds / 60);
+              const newSeconds = totalSeconds % 60;
+              const newDuration = `${newMinutes}:${newSeconds
+                .toString()
+                .padStart(2, "0")}`;
+
+              return (
+                <LongSongCard
+                  key={track.id}
+                  title={track.title || "Unknown Title"}
+                  artist={track.artist || "Unknown Title"}
+                  album={track.album || "Unknown Album"}
+                  date={formatDate(track.added_at)}
+                  duration={newDuration}
+                  cover={track.cover}
+                />
+              );
+            })
           )}
         </div>
       </div>

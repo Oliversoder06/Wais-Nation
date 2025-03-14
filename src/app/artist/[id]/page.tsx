@@ -99,7 +99,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 artist={track.artists.map((a) => a.name).join(", ")}
                 album={track.album.name}
                 date={track.album.release_date || "Unknown"}
-                duration={formatDuration(track.duration_ms)}
+                duration={formatDuration(track.duration_ms + 1000)}
                 cover={track.album.images?.[0]?.url}
               />
             ))}
