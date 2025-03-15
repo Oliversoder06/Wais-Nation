@@ -88,13 +88,12 @@ export default function TrackPage({ params }: TrackPageProps) {
       </div>
       <div className="md:mx-[40px] mx-[12px] flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <div className="flex px-[16px]">
-            <h1 className="text-nit xl:w-[35%] md:w-[50%] w-full">Tracks</h1>
-            <h1 className="text-nit xl:w-[35%] md:w-[50%] hidden md:flex">
-              Album
-            </h1>
-            <h1 className="text-nit xl:w-[20%] xl:block hidden">Released</h1>
-            <h1 className="text-nit text-end xl:w-[10%]">Duration</h1>
+          <div className="hidden md:grid grid-cols-[48px_1fr_1fr_1fr_72px] gap-4 px-4 py-2 items-end">
+            <span className="w-[48px] h-[48px]" />
+            <span className="text-nit font-semibold">Track</span>
+            <span className="text-nit font-semibold">Album</span>
+            <span className="text-nit font-semibold">Released</span>
+            <span className="text-nit font-semibold text-right">Duration</span>
           </div>
           <div className="w-full h-[1px] bg-[#2e2e2e]" />
         </div>
